@@ -1,0 +1,517 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Lunox Backfire CLI Tool
+ */
+
+define('LUNOX_START', microtime(true));
+
+require __DIR__.'/vendor/autoload.php';
+
+use Dotenv\Dotenv;
+
+// Load env
+if (file_exists(__DIR__ . '/.env')) {
+    $dotenv = Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+}
+
+$args = $argv;
+array_shift($args); // remove script name
+
+if (empty($args)) {
+    echo "=================================================\n";
+    echo " ⚡ Lunox Backfire CLI v" . ($_ENV['APP_VERSION'] ?? '1.11.0') . "\n";
+    echo "=================================================\n\n";
+    echo "Usage:\n";
+    echo "  php backfire [command] [arguments]\n\n";
+    echo "Available commands:\n";
+    echo "  make:controller    Create a new controller class\n";
+    echo "  make:model         Create a new model class\n";
+    echo "  make:middleware    Create a new middleware class\n";
+    echo "  make:migration     Create a new PHP migration file\n";
+    echo "  migrate            Run all pending database migrations\n";
+    echo "  make:seeder        Create a new database seeder class\n";
+    echo "  db:seed            Run the database seeders\n";
+    echo "  make:command       Create a new custom CLI command\n";
+    echo "  make:event         Create a new event class\n";
+    echo "  make:listener      Create a new event listener class\n";
+    echo "  key:generate       Set the application key\n";
+    echo "  cache:clear        Flush the application cache\n";
+    echo "  down               Put the application into maintenance mode\n";
+    echo "  up                 Bring the application out of maintenance mode\n";
+    echo "  monitor            Display system health and configuration\n";
+    echo "  serve              Start the development server\n";
+    
+    // Build and list custom commands
+    $commandsDir = __DIR__ . '/app/Console/Commands';
+    if (is_dir($commandsDir)) {
+        foreach (glob($commandsDir . '/*.php') as $file) {
+            require_once $file;
+            $class = 'App\\Console\\Commands\\' . basename($file, '.php');
+            if (class_exists($class)) {
+                $instance = new $class();
+                if (isset($instance->signature)) {
+                    printf("  %-18s %s\n", $instance->signature, $instance->description ?? '');
+                }
+            }
+        }
+    }
+    
+    exit(0);
+}
+
+$command = array_shift($args);
+
+// Execute custom command if matched
+$commandsDir = __DIR__ . '/app/Console/Commands';
+if (is_dir($commandsDir)) {
+    foreach (glob($commandsDir . '/*.php') as $file) {
+        require_once $file;
+        $class = 'App\\Console\\Commands\\' . basename($file, '.php');
+        if (class_exists($class)) {
+            $instance = new $class();
+            if (isset($instance->signature) && $instance->signature === $command) {
+                $instance->handle($args);
+                exit(0);
+            }
+        }
+    }
+}
+
+switch ($command) {
+    case 'make:controller':
+        if (empty($args)) {
+            echo "❌ Error: Controller name is required. (e.g. php backfire make:controller UserController)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/app/Controllers/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Controller already exists.\n";
+            exit(1);
+        }
+        $template = <<<PHP
+<?php
+
+namespace App\Controllers;
+
+use LunoxHoshizaki\Http\Request;
+
+class {$name}
+{
+    public function index(Request \$request)
+    {
+        // return \LunoxHoshizaki\View\View::make('view_name');
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Controller [app/Controllers/{$name}.php] created successfully.\n";
+        break;
+
+    case 'make:model':
+        if (empty($args)) {
+            echo "❌ Error: Model name is required.\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/app/Models/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Model already exists.\n";
+            exit(1);
+        }
+        $table = strtolower($name) . 's';
+        $template = <<<PHP
+<?php
+
+namespace App\Models;
+
+use LunoxHoshizaki\Database\Model;
+
+class {$name} extends Model
+{
+    protected string \$table = '{$table}';
+    protected array \$fillable = [];
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Model [app/Models/{$name}.php] created successfully.\n";
+        break;
+
+    case 'make:middleware':
+        if (empty($args)) {
+            echo "❌ Error: Middleware name is required.\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/src/Security/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Middleware already exists.\n";
+            exit(1);
+        }
+        $template = <<<PHP
+<?php
+
+namespace LunoxHoshizaki\Security;
+
+use LunoxHoshizaki\Middleware\MiddlewareInterface;
+use LunoxHoshizaki\Http\Request;
+use LunoxHoshizaki\Http\Response;
+use Closure;
+
+class {$name} implements MiddlewareInterface
+{
+    public function handle(Request \$request, Closure \$next): Response
+    {
+        // Add your middleware logic here
+        
+        return \$next(\$request);
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Middleware [src/Security/{$name}.php] created successfully.\n";
+        break;
+
+    case 'make:command':
+        if (empty($args)) {
+            echo "❌ Error: Command name is required. (e.g. php backfire make:command SendEmails)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/app/Console/Commands/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Command already exists.\n";
+            exit(1);
+        }
+        $dir = __DIR__ . '/app/Console/Commands';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        
+        $signature = strtolower(preg_replace('/(?<!^)[A-Z]/', ':$0', str_replace('Command', '', $name)));
+        
+        $template = <<<PHP
+<?php
+
+namespace App\Console\Commands;
+
+use LunoxHoshizaki\Console\Command;
+
+class {$name} extends Command
+{
+    public string \$signature = '{$signature}';
+    public string \$description = 'Command description';
+
+    public function handle(array \$args): void
+    {
+        \$this->info('Command {$name} executed successfully.');
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Command [app/Console/Commands/{$name}.php] created successfully.\n";
+        break;
+
+    case 'make:event':
+        if (empty($args)) {
+            echo "❌ Error: Event name is required. (e.g. php backfire make:event UserRegistered)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/app/Events/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Event already exists.\n";
+            exit(1);
+        }
+        $dir = __DIR__ . '/app/Events';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $template = <<<PHP
+<?php
+
+namespace App\Events;
+
+class {$name}
+{
+    // Add your event properties here
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Event [app/Events/{$name}.php] created successfully.\n";
+        break;
+
+    case 'make:listener':
+        if (empty($args)) {
+            echo "❌ Error: Listener name is required. (e.g. php backfire make:listener SendWelcomeEmail)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/app/Listeners/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Listener already exists.\n";
+            exit(1);
+        }
+        $dir = __DIR__ . '/app/Listeners';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $template = <<<PHP
+<?php
+
+namespace App\Listeners;
+
+class {$name}
+{
+    public function handle(\$event): void
+    {
+        // Add your listener logic here
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Listener [app/Listeners/{$name}.php] created successfully.\n";
+        break;
+
+    case 'make:migration':
+        if (empty($args)) {
+            echo "❌ Error: Migration name is required. (e.g. php backfire make:migration create_users_table)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $className = str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
+        // Guess table name if format is 'create_X_table'
+        $tableName = 'table_name';
+        if (preg_match('/create_(.*)_table/', $name, $matches)) {
+            $tableName = $matches[1];
+        }
+        $timestamp = date('Y_m_d_His');
+        $filename = "{$timestamp}_{$name}.php";
+        $dir = __DIR__ . '/database/migrations';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $path = $dir . '/' . $filename;
+        $template = <<<PHP
+<?php
+
+use LunoxHoshizaki\Database\Schema\Schema;
+use LunoxHoshizaki\Database\Schema\Blueprint;
+
+class {$className}
+{
+    public function up()
+    {
+        Schema::create('{$tableName}', function (Blueprint \$table) {
+            \$table->id();
+            \$table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('{$tableName}');
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Migration [database/migrations/{$filename}] created successfully.\n";
+        break;
+
+    case 'migrate':
+        echo "⚡ Running migrations...\n";
+        try {
+            $pdo = \LunoxHoshizaki\Database\Model::getConnection();
+            $dir = __DIR__ . '/database/migrations';
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            $migrator = new \LunoxHoshizaki\Database\Migrator($pdo, $dir);
+            $executed = $migrator->run();
+            
+            if (empty($executed)) {
+                echo "No pending migrations to run.\n";
+            } else {
+                foreach ($executed as $file) {
+                    echo "✅ Migrated: {$file}\n";
+                }
+            }
+        } catch (\Exception $e) {
+            echo "❌ Migration failed: " . $e->getMessage() . "\n";
+            exit(1);
+        }
+        break;
+
+    case 'make:seeder':
+        if (empty($args)) {
+            echo "❌ Error: Seeder name is required. (e.g. php backfire make:seeder UserSeeder)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/database/seeders/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Seeder already exists.\n";
+            exit(1);
+        }
+        $dir = __DIR__ . '/database/seeders';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $template = <<<PHP
+<?php
+
+namespace Database\Seeders;
+
+use LunoxHoshizaki\Database\Seeder;
+
+class {$name} extends Seeder
+{
+    public function run(): void
+    {
+        // Add your seed logic here
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Seeder [database/seeders/{$name}.php] created successfully.\n";
+        break;
+
+    case 'db:seed':
+        echo "⚡ Seeding database...\n";
+        try {
+            $class = $args[0] ?? 'Database\Seeders\DatabaseSeeder';
+            $path = __DIR__ . '/database/seeders/' . basename(str_replace('\\', '/', $class)) . '.php';
+            
+            if (!file_exists($path)) {
+                echo "❌ Error: Seeder class not found at {$path}.\n";
+                exit(1);
+            }
+            
+            require_once $path;
+            
+            if (!class_exists($class)) {
+                // If namespace wasn't provided but file exists, try to guess it
+                $class = 'Database\\Seeders\\' . $args[0];
+                if (!class_exists($class)) {
+                     echo "❌ Error: Seeder class {$class} not found.\n";
+                     exit(1);
+                }
+            }
+            
+            $seeder = new $class();
+            $seeder->run();
+            echo "✅ Database seeding completed successfully.\n";
+        } catch (\Exception $e) {
+            echo "❌ Seeding failed: " . $e->getMessage() . "\n";
+            exit(1);
+        }
+        break;
+
+    case 'key:generate':
+        $envPath = __DIR__ . '/.env';
+        if (!file_exists($envPath)) {
+            echo "❌ Error: .env file not found.\n";
+            exit(1);
+        }
+        $key = 'base64:' . base64_encode(random_bytes(32));
+        $content = file_get_contents($envPath);
+        $content = preg_replace('/^APP_KEY=.*$/m', 'APP_KEY=' . $key, $content);
+        file_put_contents($envPath, $content);
+        echo "✅ Application key set successfully.\n";
+        break;
+
+    case 'cache:clear':
+        // Clear temp session files
+        $sessDir = sys_get_temp_dir() . '/sess_*';
+        foreach (glob($sessDir) as $file) {
+            @unlink($file);
+        }
+        
+        // Clear application cache using the Cache class
+        if (class_exists(\LunoxHoshizaki\Cache\Cache::class)) {
+            \LunoxHoshizaki\Cache\Cache::flush();
+        }
+        
+        echo "✅ Application cache and sessions cleared successfully.\n";
+        break;
+        
+    case 'down':
+        $frameworkDir = __DIR__ . '/storage/framework';
+        if (!is_dir($frameworkDir)) {
+            mkdir($frameworkDir, 0755, true);
+        }
+        file_put_contents($frameworkDir . '/down', json_encode([
+            'time' => time(),
+            'message' => 'Service Unavailable',
+            'retry' => 60
+        ]));
+        echo "✅ Application is now in maintenance mode.\n";
+        break;
+
+    case 'up':
+        $downFile = __DIR__ . '/storage/framework/down';
+        if (file_exists($downFile)) {
+            @unlink($downFile);
+            echo "✅ Application is now live.\n";
+        } else {
+            echo "ℹ️ Application is already live.\n";
+        }
+        break;
+
+    case 'monitor':
+    case 'about':
+        echo "=================================================\n";
+        echo " 📊 System Health & Environment Status\n";
+        echo "=================================================\n";
+        
+        $env = $_ENV['APP_ENV'] ?? 'Unknown';
+        $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true' ? 'Enabled' : 'Disabled';
+        $version = $_ENV['APP_VERSION'] ?? '1.11.0';
+        
+        echo "  Application:\n";
+        echo "    Name        : " . ($_ENV['APP_NAME'] ?? 'Lunox Backfire') . "\n";
+        echo "    Version     : $version\n";
+        echo "    Environment : $env\n";
+        echo "    Debug Mode  : $debug\n";
+        echo "    URL         : " . ($_ENV['APP_URL'] ?? 'http://localhost:8000') . "\n";
+        
+        echo "\n  System PHP:\n";
+        echo "    PHP Version : " . PHP_VERSION . "\n";
+        echo "    Server OS   : " . PHP_OS . "\n";
+        echo "    PDO Ext     : " . (extension_loaded('pdo') ? '✅ Yes' : '❌ No') . "\n";
+        echo "    OpenSSL     : " . (extension_loaded('openssl') ? '✅ Yes' : '❌ No') . "\n";
+        echo "    MBString    : " . (extension_loaded('mbstring') ? '✅ Yes' : '❌ No') . "\n";
+        
+        echo "\n  Database:\n";
+        echo "    Connection  : " . ($_ENV['DB_CONNECTION'] ?? 'Not Set') . "\n";
+        echo "    Database    : " . ($_ENV['DB_DATABASE'] ?? 'Not Set') . "\n";
+        
+        echo "\n  Cache & Storage:\n";
+        $cacheSize = 0;
+        $cachePath = __DIR__ . '/storage/framework/cache';
+        if (is_dir($cachePath)) {
+            foreach (glob($cachePath . '/*') as $file) {
+                $cacheSize += filesize($file);
+            }
+        }
+        echo "    Cache Size  : " . number_format($cacheSize / 1024, 2) . " KB\n";
+        
+        $maintenance = file_exists(__DIR__ . '/storage/framework/down') ? '⚠️ Active (Down)' : '🟢 Inactive (Live)';
+        echo "    Maintenance : $maintenance\n";
+        
+        echo "=================================================\n";
+        break;
+        
+    case 'serve':
+        echo "⚡ Lunox Backfire Development Server started on http://localhost:8000\n";
+        echo "Press Ctrl+C to stop.\n";
+        passthru("php -S localhost:8000 -q server.php");
+        break;
+
+    default:
+        echo "❌ Error: Command \"{$command}\" is not defined.\n";
+        exit(1);
+}

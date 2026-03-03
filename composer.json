@@ -1,0 +1,23 @@
+{
+    "name": "lunoxhoshizaki/framework-lite",
+    "description": "A lightweight but advanced PHP MVC Framework.",
+    "type": "project",
+    "require": {
+        "php": "^8.0",
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "LunoxHoshizaki\\": "src/",
+            "App\\": "app/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "optimize-autoloader": true
+    }
+}
