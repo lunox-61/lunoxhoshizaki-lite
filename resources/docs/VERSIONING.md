@@ -34,6 +34,12 @@ Sangat direkomendasikan untuk mencatat apa saja yang berubah di file `CHANGELOG.
 **Contoh Format:**
 
 ```markdown
+## [1.11.1] - 2026-03-03
+### Security (ISO 27001 Patches)
+- **[A.14]** Bumped minimum PHP requirement to `^8.1` to mitigate EOL vulnerabilities.
+- **[A.14]** Restricted detailed exception and stack trace rendering when `APP_ENV=production`.
+- **[A.13]** Enforced secure session cookie parameters (`httponly`, `use_strict_mode`, and `secure` conditionally).
+
 ## [1.11.0] - 2026-03-03
 ### Added
 - **[Phase 6]** Security & Anti-DDoS Protections.

@@ -3,8 +3,10 @@
     "description": "A lightweight but advanced PHP MVC Framework.",
     "type": "project",
     "require": {
-        "php": "^8.0",
-        "vlucas/phpdotenv": "^5.6"
+        "php": "^8.1",
+        "vlucas/phpdotenv": "^5.6",
+        "phpmailer/phpmailer": "^7.0",
+        "erusev/parsedown": "^1.8"
     },
     "autoload": {
         "psr-4": {

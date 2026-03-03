@@ -2,6 +2,9 @@
 
 namespace LunoxHoshizaki\Mail;
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 class Mail
 {
     protected array $to = [];
@@ -25,19 +28,52 @@ class Mail
     public function send(Mailable $mailable): bool
     {
         $mailable->build();
-        
-        $to = implode(', ', $this->to);
-        $subject = $mailable->subject;
-        $message = $mailable->render();
-        
-        $from = $_ENV['MAIL_FROM_ADDRESS'] ?? 'hello@example.com';
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-type: text/html; charset=utf-8',
-            'From: ' . $from,
-        ];
 
-        // Using PHP's native mail function
-        return mail($to, $subject, $message, implode("\r\n", $headers));
+        $mail = new PHPMailer(true);
+
+        try {
+            if (($_ENV['MAIL_MAILER'] ?? 'mail') === 'smtp') {
+                $mail->isSMTP();
+                $mail->Host = $_ENV['MAIL_HOST'] ?? 'localhost';
+
+                $username = $_ENV['MAIL_USERNAME'] ?? 'null';
+                $password = $_ENV['MAIL_PASSWORD'] ?? 'null';
+
+                if ($username !== 'null' && $username !== '') {
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $username;
+                    $mail->Password = $password !== 'null' ? $password : '';
+                } else {
+                    $mail->SMTPAuth = false;
+                }
+
+                $encryption = $_ENV['MAIL_ENCRYPTION'] ?? 'null';
+                if ($encryption !== 'null' && $encryption !== '') {
+                    $mail->SMTPSecure = strtolower($encryption) === 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
+                }
+                $mail->Port = $_ENV['MAIL_PORT'] ?? 2525;
+            } else {
+                $mail->isMail();
+            }
+
+            $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'hello@example.com';
+            $fromName = $_ENV['MAIL_FROM_NAME'] ?? 'Example';
+
+            $mail->setFrom($fromAddress, $fromName);
+
+            foreach ($this->to as $address) {
+                $mail->addAddress(trim($address));
+            }
+
+            $mail->isHTML(true);
+            $mail->Subject = $mailable->subject;
+            $mail->Body = $mailable->render();
+            $mail->AltBody = strip_tags($mail->Body);
+
+            return $mail->send();
+        } catch (Exception $e) {
+            error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+            return false;
+        }
     }
 }

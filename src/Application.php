@@ -90,6 +90,22 @@ class Application
             }
 
             if (session_status() === PHP_SESSION_NONE) {
+                // ISO 27001 Security: Secure Session Cookie Parameters
+                $currentParams = session_get_cookie_params();
+                $isProduction = ($_ENV['APP_ENV'] ?? 'local') === 'production';
+                $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+
+                session_set_cookie_params([
+                    'lifetime' => $currentParams['lifetime'],
+                    'path' => $currentParams['path'],
+                    'domain' => $currentParams['domain'],
+                    'secure' => $isProduction || $isHttps,
+                    'httponly' => true,
+                    'samesite' => 'Strict'
+                ]);
+
+                ini_set('session.use_strict_mode', '1');
+
                 // Ensure session is started for flash messaging
                 session_start();
             }
@@ -119,16 +135,20 @@ class Application
             $statusCode = 404;
         }
 
+        // ISO 27001: Prevent detailed error stack traces in production
+        $isProduction = ($_ENV['APP_ENV'] ?? 'local') === 'production';
+        $exceptionToRender = $isProduction ? null : $e;
+
         try {
             $content = \LunoxHoshizaki\View\View::make('errors.error', [
                 'code' => $statusCode,
                 'message' => 'Internal Server Error',
-                'exception' => $e
+                'exception' => $exceptionToRender
             ]);
             $response = new Response($content, $statusCode);
         } catch (Exception $viewException) {
             // Fallback if view fails
-            $response = new Response("Error {$statusCode}: {$message}", $statusCode);
+            $response = new Response("Error {$statusCode}: " . ($isProduction ? "Server Error" : $message), $statusCode);
         }
 
         $response->send();
