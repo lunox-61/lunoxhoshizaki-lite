@@ -9,7 +9,7 @@ class HomeController
 {
     public function index(Request $request)
     {
-        return View::make('home', [
+        return View::make('basic.home', [
             'title' => 'Welcome to LunoxHoshizaki Lite',
             'message' => 'A beautifully modern, lightweight PHP MVC Framework.'
         ]);
@@ -17,7 +17,7 @@ class HomeController
 
     public function about(Request $request)
     {
-        return View::make('about', [
+        return View::make('basic.about', [
             'title' => 'About Us'
         ]);
     }
@@ -25,7 +25,7 @@ class HomeController
     public function formSubmit(Request $request)
     {
         $name = $request->input('name', 'Guest');
-        return View::make('home', [
+        return View::make('basic.home', [
             'title' => 'Form Submitted',
             'message' => "Hello, {$name}! Your form was successfully submitted. CSRF validation passed."
         ]);

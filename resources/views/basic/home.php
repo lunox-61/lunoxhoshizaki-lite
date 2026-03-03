@@ -1,5 +1,5 @@
 <?php use LunoxHoshizaki\View\View; ?>
-<?php View:: extends('layouts.app'); ?>
+<?php View:: extends('basic.layouts.app'); ?>
 
 <?php View::section('content'); ?>
 <div class="d-flex flex-column justify-content-center align-items-center text-center py-5 my-5">

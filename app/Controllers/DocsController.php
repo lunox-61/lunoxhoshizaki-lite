@@ -43,7 +43,7 @@ class DocsController
             throw new \Exception("Documentation page not found.", 404);
         }
 
-        return \LunoxHoshizaki\View\View::make('docs.page', [
+        return \LunoxHoshizaki\View\View::make('basic.docs.page', [
             'title' => $pages[$page] . ' - Documentation',
             'activeLine' => $page,
             'pages' => $pages

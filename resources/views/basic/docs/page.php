@@ -1,5 +1,5 @@
 <?php use LunoxHoshizaki\View\View; ?>
-<?php View:: extends('layouts.docs'); ?>
+<?php View:: extends('basic.layouts.docs'); ?>
 
 <?php View::section('docs-content'); ?>
 
@@ -18,8 +18,8 @@
     <p>Kalo kamu pengen nama folder <i>project</i>-mu beda dari nama aslinya (misal mau dinamain <code>toko-online</code>
         atau <code>my-app</code>), tambahin aja namanya di akhir perintah <code>git clone</code> kayak gini:</p>
     <pre><code># Format: git clone [URL_REPO] [NAMA_FOLDER_KAMU]
-git clone https://github.com/lunox-61/lunoxhoshizaki-lite.git toko-online
-cd toko-online</code></pre>
+    git clone https://github.com/lunox-61/lunoxhoshizaki-lite.git toko-online
+    cd toko-online</code></pre>
 
     <p><b>2. Install Dependencies Pihak Ketiga</b></p>
     <p>Sekarang jalanin perintah Composer buat nge-download semua pustaka pendukung (termasuk buat baca file <i>.env</i>):
@@ -75,31 +75,31 @@ cd toko-online</code></pre>
         gini buat ngembaliin teks atau manggil halaman tampilan (*View*):</p>
     <pre><code>use LunoxHoshizaki\Routing\Router;
 
-Router::get('/halo', function () {
-    return 'Halo Dunia! Welcome!';
-});</code></pre>
+    Router::get('/halo', function () {
+        return 'Halo Dunia! Welcome!';
+    });</code></pre>
 
     <h2>Nangkep Data dari URL (Parameter)</h2>
     <p>Kadang kita pengen bikin URL yang dinamis, misalnya URL profil user yang isinya beda-beda ID-nya. Gampang, tinggal
         pake tanda kurung kurawal <code>{ }</code> aja:</p>
     <pre><code>Router::get('/user/{id}', function ($request, $id) {
-    return 'Melihat Profil Pengguna dengan ID: ' . $id;
-});</code></pre>
+        return 'Melihat Profil Pengguna dengan ID: ' . $id;
+    });</code></pre>
 
     <h2>Menangani POST, PUT, DELETE HTTP</h2>
     <p>Untuk nerima data hasil *submit* dari form (formulir) HTML atau kalo kamu bikin REST API, kamu bisa pake metode yang
         lain selain GET:</p>
     <pre><code>Router::post('/user/simpan', [UserController::class, 'store']);
-Router::put('/user/{id}/update', [UserController::class, 'update']);
-Router::delete('/user/{id}/hapus', [UserController::class, 'destroy']);</code></pre>
+    Router::put('/user/{id}/update', [UserController::class, 'update']);
+    Router::delete('/user/{id}/hapus', [UserController::class, 'destroy']);</code></pre>
 
     <h2>Ngelompokin URL (Grup & Middleware)</h2>
     <p>Kalo kamu punya banyak rute yang butuh perlindungan (misalnya, cuma boleh diakses kalo udah login/admin), daripada
         nulis satu-satu, mending masukin aja ke dalem grup kayak gini:</p>
     <pre><code>Router::group(['prefix' => '/admin', 'middleware' => [AuthMiddleware::class]], function () {
-    Router::get('/dashboard', [AdminController::class, 'index']); // Jadinya: /admin/dashboard
-    Router::get('/setting', [AdminController::class, 'setting']); // Jadinya: /admin/setting
-});</code></pre>
+        Router::get('/dashboard', [AdminController::class, 'index']); // Jadinya: /admin/dashboard
+        Router::get('/setting', [AdminController::class, 'setting']); // Jadinya: /admin/setting
+    });</code></pre>
 
 <?php elseif ($activeLine === 'middleware'): ?>
     <h1>Middleware (Si Tukang Jaga Pintu)</h1>
@@ -117,36 +117,36 @@ Router::delete('/user/{id}/hapus', [UserController::class, 'destroy']);</code></
         bocil (di bawah 18 tahun) buat masuk:</p>
     <pre><code>namespace App\Middleware;
 
-use LunoxHoshizaki\Http\Request;
+    use LunoxHoshizaki\Http\Request;
 
-class CheckAge
-{
-    public function handle(Request $request, \Closure $next)
+    class CheckAge
     {
-        if ($request->input('age') < 18) {
-            // Kalo di bawah umur, tendang balik ke home!
-            return redirect('/home');
-        }
+        public function handle(Request $request, \Closure $next)
+        {
+            if ($request->input('age') < 18) {
+                // Kalo di bawah umur, tendang balik ke home!
+                return redirect('/home');
+            }
 
-        // Kalo aman, silakan masuk~
-        return $next($request);
-    }
-}</code></pre>
+            // Kalo aman, silakan masuk~
+            return $next($request);
+        }
+    }</code></pre>
 
     <h2>Daftarin & Pake Middleware</h2>
     <p>Kalo file-nya udah jadi, kamu bisa langsung pasang satpam ini ke *route* tertentu di `routes/web.php` atau
         `routes/api.php`.</p>
     <pre><code>use App\Middleware\CheckAge;
 
-// Pasang satpam cuma di satu halaman ini aja
-Router::get('/khusus-dewasa', function () {
-    return 'Selamat datang di area khusus!';
-})->middleware(CheckAge::class);
+    // Pasang satpam cuma di satu halaman ini aja
+    Router::get('/khusus-dewasa', function () {
+        return 'Selamat datang di area khusus!';
+    })->middleware(CheckAge::class);
 
-// Atau sekalian pasang satpam di satu blok grup halaman
-Router::group(['prefix' => '/admin', 'middleware' => [CheckAge::class]], function () {
-    Router::get('/dashboard', [AdminController::class, 'index']); // Aman!
-});</code></pre>
+    // Atau sekalian pasang satpam di satu blok grup halaman
+    Router::group(['prefix' => '/admin', 'middleware' => [CheckAge::class]], function () {
+        Router::get('/dashboard', [AdminController::class, 'index']); // Aman!
+    });</code></pre>
 
 <?php elseif ($activeLine === 'controllers'): ?>
     <h1>Controllers (Si Pengatur Lalu Lintas)</h1>
@@ -164,27 +164,27 @@ Router::group(['prefix' => '/admin', 'middleware' => [CheckAge::class]], functio
         HTML (<i>View</i>) atau format JSON (kalo bikin API):</p>
     <pre><code>namespace App\Controllers;
 
-use LunoxHoshizaki\Http\Request;
-use LunoxHoshizaki\View\View;
-use LunoxHoshizaki\Http\Response;
+    use LunoxHoshizaki\Http\Request;
+    use LunoxHoshizaki\View\View;
+    use LunoxHoshizaki\Http\Response;
 
-class UserController
-{
-    // Contoh nampilin halaman HTML profil user
-    public function show(Request $request, $id)
+    class UserController
     {
-        return View::make('user.profile', ['id' => $id]);
-    }
+        // Contoh nampilin halaman HTML profil user
+        public function show(Request $request, $id)
+        {
+            return View::make('user.profile', ['id' => $id]);
+        }
 
-    // Contoh ngebalikin data JSON (Mantap buat bikin API Frontend)
-    public function getJson(Request $request)
-    {
-        $response = new Response();
-        $response->setContent(json_encode(['status' => 'success', 'data' => 'Data Rahasia']));
-        $response->setHeader('Content-Type', 'application/json');
-        return $response;
-    }
-}</code></pre>
+        // Contoh ngebalikin data JSON (Mantap buat bikin API Frontend)
+        public function getJson(Request $request)
+        {
+            $response = new Response();
+            $response->setContent(json_encode(['status' => 'success', 'data' => 'Data Rahasia']));
+            $response->setHeader('Content-Type', 'application/json');
+            return $response;
+        }
+    }</code></pre>
 
     <h2>Nyambungin Controller ke Route</h2>
     <p>Cara manggilnya di file rute gampang banget, tinggal tulis nama *Class Controller*-nya sama nama fungsinya di dalem
@@ -202,7 +202,7 @@ class UserController
         <code>.php</code> ya):
     </p>
     <pre><code>// Bakal manggil file resources/views/greeting.php
-return View::make('greeting', ['nama' => 'Budi']);</code></pre>
+    return View::make('greeting', ['nama' => 'Budi']);</code></pre>
     <p>Terus di dalem file <code>greeting.php</code>, bebas deh kamu cetak datanya (Ingat: usahain selalu pake helper
         <code>e()</code> biar webmu kebal serangan XSS!):
     </p>
@@ -214,19 +214,19 @@ return View::make('greeting', ['nama' => 'Budi']);</code></pre>
 
     <p><b>1. Bikin Master Layout Dulu (misal di <code>resources/views/layouts/app.php</code>):</b></p>
     <pre><code>&lt;html&gt;
-&lt;head&gt;&lt;title&gt;Aplikasi Keren&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-    &lt;!-- Ini titik tempat konten halaman bakal dimasukin --&gt;
-    &lt;?= $this-&gt;yieldContent('content') ?&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
+    &lt;head&gt;&lt;title&gt;Aplikasi Keren&lt;/title&gt;&lt;/head&gt;
+    &lt;body&gt;
+        &lt;!-- Ini titik tempat konten halaman bakal dimasukin --&gt;
+        &lt;?= $this-&gt;yieldContent('content') ?&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;</code></pre>
 
     <p><b>2. Pake Layoutnya di Halaman Lain:</b></p>
     <pre><code>&lt;?php View::extends('layouts.app'); ?&gt;
 
-&lt;?php View::section('content'); ?&gt;
-    &lt;h1&gt;Hai, ini spesifik muncul di bagian dalem body lho!&lt;/h1&gt;
-&lt;?php View::endsection(); ?&gt;</code></pre>
+    &lt;?php View::section('content'); ?&gt;
+        &lt;h1&gt;Hai, ini spesifik muncul di bagian dalem body lho!&lt;/h1&gt;
+    &lt;?php View::endsection(); ?&gt;</code></pre>
 
 <?php elseif ($activeLine === 'database'): ?>
     <h1>Database & Models</h1>
@@ -237,11 +237,11 @@ return View::make('greeting', ['nama' => 'Budi']);</code></pre>
     <p>Sebelum mulai main data, pastiin file <code>.env</code> kamu udah diisi info login yang bener sesuai sama server
         MySQL di komputermu:</p>
     <pre><code>DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=lunox_lite
-DB_USERNAME=root
-DB_PASSWORD=rahasia</code></pre>
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=lunox_lite
+    DB_USERNAME=root
+    DB_PASSWORD=rahasia</code></pre>
 
     <h2>Bikin Model Buat Tabel</h2>
     <p>Biasanya, tiap tabel di database itu diwakilin sama satu <b>Model</b>. Coba jalanin CLI Backfire ini:</p>
@@ -252,41 +252,41 @@ DB_PASSWORD=rahasia</code></pre>
     <h2>Operasi CRUD (Nambah, Baca, Edit, Hapus)</h2>
     <p>Saking gampangnya, nyimpen baris data baru ke tabel tuh cuma gini doang:</p>
     <pre><code>// CREATE: Buat nabung data baru
-$produk = new Product();
-$produk->name = 'Buku Panduan Ajaib';
-$produk->price = 150000;
-$produk->save();
+    $produk = new Product();
+    $produk->name = 'Buku Panduan Ajaib';
+    $produk->price = 150000;
+    $produk->save();
 
-// READ: Ngambil data dari tabel
-$satuProduk = Product::find(1); // Cuma ngambil yang ID-nya 1
-$semuaProduk = Product::where('price', '>', 50000)->get();
+    // READ: Ngambil data dari tabel
+    $satuProduk = Product::find(1); // Cuma ngambil yang ID-nya 1
+    $semuaProduk = Product::where('price', '>', 50000)->get();
 
-// UPDATE: Ngedit / ngerubah data lama
-$produkLama = Product::find(1);
-$produkLama->price = 100000;
-$produkLama->save();
+    // UPDATE: Ngedit / ngerubah data lama
+    $produkLama = Product::find(1);
+    $produkLama->price = 100000;
+    $produkLama->save();
 
-// DELETE: Ngehapus selamanya
-$produkHapus = Product::find(2);
-$produkHapus->delete();</code></pre>
+    // DELETE: Ngehapus selamanya
+    $produkHapus = Product::find(2);
+    $produkHapus->delete();</code></pre>
 
     <h2>Lagi Mau Kueri Ribet? Pake Advanced Query Builder!</h2>
     <p>Kalo kamu butuh narik data spesifik pake *sorting*, *limit*, sampe dibikin halaman-halaman otomatis (Paginasi) ala
         Bootstrap 5:</p>
     <pre><code>// Tarik data pake urutan dan batas
-$terlaris = Product::query()
-    ->where('stock', '>', 0)
-    ->orderBy('sold_count DESC')
-    ->limit(10)
-    ->get();
+    $terlaris = Product::query()
+        ->where('stock', '>', 0)
+        ->orderBy('sold_count DESC')
+        ->limit(10)
+        ->get();
 
-// Otomatis mecah data jadi 15 barang per halaman
-$semuaProduk = Product::paginate(15);
-</code></pre>
+    // Otomatis mecah data jadi 15 barang per halaman
+    $semuaProduk = Product::paginate(15);
+    </code></pre>
 
     <p>Terus panggil fungsi jitu ini di file <i>View</i> kamu buat ngerender tombol-tombol halamannya:</p>
     <pre><code>&lt;!-- Nampilin navigasi halaman (<< 1 2 3 >>) otomatis --&gt;
-&lt;?= $semuaProduk-&gt;links() ?&gt;</code></pre>
+    &lt;?= $semuaProduk-&gt;links() ?&gt;</code></pre>
 
 <?php elseif ($activeLine === 'validation'): ?>
     <h1>Validation & Forms (Formulir Aman)</h1>
@@ -297,41 +297,41 @@ $semuaProduk = Product::paginate(15);
     <h2>Filter Request Masuk</h2>
     <p>Kamu cuma perlu nentuin *rules* (aturan) apa aja yang wajib ditepatin sama inputan *user*:</p>
     <pre><code>public function store(Request $request)
-{
-    // Kalo ada yang kosong/salah, prosesnya langsung stop dan dibalikin ke form sebelumnya
-    $validated = $request->validate([
-        'title' => 'required|max:255',
-        'body'  => 'required',
-        'email' => 'required|email'
-    ]);
+    {
+        // Kalo ada yang kosong/salah, prosesnya langsung stop dan dibalikin ke form sebelumnya
+        $validated = $request->validate([
+            'title' => 'required|max:255',
+            'body'  => 'required',
+            'email' => 'required|email'
+        ]);
 
-    // Kalo lolos validasi, baru lanjut simpen...
-    $post = new Post();
-    $post->title = $validated['title'];
-    $post->save();
+        // Kalo lolos validasi, baru lanjut simpen...
+        $post = new Post();
+        $post->title = $validated['title'];
+        $post->save();
 
-    return redirect('/posts');
-}</code></pre>
+        return redirect('/posts');
+    }</code></pre>
 
     <h2>Munculin Peringatan Merah di HTML</h2>
     <p>Kalo *user* salah ngisi, sistem langsung nge-<i>flash</i> notifikasi pesannya ke Sesi. Pake Helper
         <code>errors()</code> dan <code>old()</code> biar form-mu tetep estetik dan nggak ngeselin buat pengunjung:
     </p>
     <pre><code>&lt;form action="/simpan" method="POST"&gt;
-    &lt;!-- JANGAN LUPA! Selalu taruh anti-hack token ini di semua form! --&gt;
-    &lt;?= csrf_field() ?&gt;
+        &lt;!-- JANGAN LUPA! Selalu taruh anti-hack token ini di semua form! --&gt;
+        &lt;?= csrf_field() ?&gt;
 
-    &lt;label&gt;Judul:&lt;/label&gt;
-    &lt;!-- Biar user nggak capek ngetik ulang kalo filenya salah --&gt;
-    &lt;input type="text" name="title" value="&lt;?= e(old('title')) ?&gt;"&gt;
+        &lt;label&gt;Judul:&lt;/label&gt;
+        &lt;!-- Biar user nggak capek ngetik ulang kalo filenya salah --&gt;
+        &lt;input type="text" name="title" value="&lt;?= e(old('title')) ?&gt;"&gt;
 
-    &lt;!-- Misal error `title` muncul, kita cetak teks merah --&gt;
-    &lt;?php if ($error = errors('title')): ?&gt;
-        &lt;div style="color:red;"&gt;Ups! &lt;?= $error ?&gt;&lt;/div&gt;
-    &lt;?php endif; ?&gt;
+        &lt;!-- Misal error `title` muncul, kita cetak teks merah --&gt;
+        &lt;?php if ($error = errors('title')): ?&gt;
+            &lt;div style="color:red;"&gt;Ups! &lt;?= $error ?&gt;&lt;/div&gt;
+        &lt;?php endif; ?&gt;
 
-    &lt;button type="submit"&gt;Kirim Data&lt;/button&gt;
-&lt;/form&gt;</code></pre>
+        &lt;button type="submit"&gt;Kirim Data&lt;/button&gt;
+    &lt;/form&gt;</code></pre>
 
 <?php elseif ($activeLine === 'authentication'): ?>
     <h1>Authentication (Sistem Login)</h1>
@@ -343,54 +343,54 @@ $semuaProduk = Product::paginate(15);
         <code>password_hash()</code> bawaan PHP biar lebih aman:
     </p>
     <pre><code>public function register(Request $request)
-{
-    $validated = $request->validate([
-        'email'    => 'required|email',
-        'password' => 'required'
-    ]);
+    {
+        $validated = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required'
+        ]);
 
-    $user = new User();
-    $user->email = $validated['email'];
-    // Hash password-nya pake algoritma default PHP (BCRYPT)
-    $user->password = password_hash($validated['password'], PASSWORD_DEFAULT);
-    $user->save();
+        $user = new User();
+        $user->email = $validated['email'];
+        // Hash password-nya pake algoritma default PHP (BCRYPT)
+        $user->password = password_hash($validated['password'], PASSWORD_DEFAULT);
+        $user->save();
 
-    // Habis daftar, arahkan ke halaman login
-    return redirect('/login');
-}</code></pre>
+        // Habis daftar, arahkan ke halaman login
+        return redirect('/login');
+    }</code></pre>
 
     <h2>Coba Masuk (Auth Attempt)</h2>
     <p>Kamu bisa pakai fungsi <code>Auth::attempt</code> buat nyocokin *email* dan *password* dari *form* dengan data di
         *database*. Secara bawaan, ini bakal baca dari tabel <code>User</code>:</p>
     <pre><code>use LunoxHoshizaki\Auth\Auth;
 
-if (Auth::attempt(['email' => $email, 'password' => $password])) {
-    // Kalo cocok, sesi login dibuat, lanjut ke halaman utama
-    return redirect('/dashboard');
-} else {
-    // Kalo gagal, balikin lagi dengan pesan error
-}</code></pre>
+    if (Auth::attempt(['email' => $email, 'password' => $password])) {
+        // Kalo cocok, sesi login dibuat, lanjut ke halaman utama
+        return redirect('/dashboard');
+    } else {
+        // Kalo gagal, balikin lagi dengan pesan error
+    }</code></pre>
 
     <h2>Ngecek Status Pengguna</h2>
     <p>Setelah *user* login, kamu bisa panggil datanya di mana aja (Controller atau View) pake *Facade* <code>Auth</code>:
     </p>
     <pre><code>// Ngambil instance model User yang lagi login
-$user = Auth::user();
-echo $user->email; // Contoh nampilin email
+    $user = Auth::user();
+    echo $user->email; // Contoh nampilin email
 
-// Atau ngambil ID-nya aja
-$id = Auth::id();
+    // Atau ngambil ID-nya aja
+    $id = Auth::id();
 
-// Buat ngecek simpel si user ini udah login belum
-if (Auth::check()) {
-    // Kalau udah
-}</code></pre>
+    // Buat ngecek simpel si user ini udah login belum
+    if (Auth::check()) {
+        // Kalau udah
+    }</code></pre>
 
     <h2>Kunci Halaman Pake Middleware</h2>
     <p>Biar halaman rahasia (misal dasbor admin) nggak bisa diintip tamu, tempel aja gembok <code>AuthMiddleware</code> di
         file *route* kamu:</p>
     <pre><code>Router::get('/profile', [ProfileController::class, 'show'])
-->middleware(LunoxHoshizaki\Security\AuthMiddleware::class);</code></pre>
+    ->middleware(LunoxHoshizaki\Security\AuthMiddleware::class);</code></pre>
 
 <?php elseif ($activeLine === 'helpers'): ?>
     <h1>Global Helpers & Sesi</h1>
@@ -427,18 +427,18 @@ if (Auth::check()) {
 
     <h2>Kayak Gini Nih Bentuknya</h2>
     <pre><code>use LunoxHoshizaki\Database\Schema\Schema;
-use LunoxHoshizaki\Database\Schema\Blueprint;
+    use LunoxHoshizaki\Database\Schema\Blueprint;
 
-public function up()
-{
-    Schema::create('flights', function (Blueprint $table) {
-        $table->id(); // Bikin ID Primary Key otomatis (INT AUTO_INCREMENT)
-        $table->string('name', 100); // Teks maksimal 100 huruf (VARCHAR)
-        $table->boolean('is_active'); // Bener atau salah (TINYINT)
-        $table->timestamps(); // Kasih info kapan dibuat & kapan diedit
-        $table->softDeletes(); // Fitur hapus pura-pura (deleted_at)
-    });
-}</code></pre>
+    public function up()
+    {
+        Schema::create('flights', function (Blueprint $table) {
+            $table->id(); // Bikin ID Primary Key otomatis (INT AUTO_INCREMENT)
+            $table->string('name', 100); // Teks maksimal 100 huruf (VARCHAR)
+            $table->boolean('is_active'); // Bener atau salah (TINYINT)
+            $table->timestamps(); // Kasih info kapan dibuat & kapan diedit
+            $table->softDeletes(); // Fitur hapus pura-pura (deleted_at)
+        });
+    }</code></pre>
 
     <h2>Eksekusi Migrasinya!</h2>
     <p>Kalo desain tabelnya udah beres, suruh si Backfire ngerubah rengrengannya jadi wujud fisik tabel SQL dengan *command*
@@ -449,12 +449,12 @@ public function up()
     <p>Pas lagi *coding*, kita kan pasti butuh banyak "dummy data" (data palsu) buat ngetes *layout*, kan? Daripada ngisi
         manual lewat phpMyAdmin, biarin <i>Seeders</i> yang kerja kasar:</p>
     <pre><code>// 1. Suruh Backfire buatin kerangka Seedernya
-php backfire make:seeder UserSeeder
+    php backfire make:seeder UserSeeder
 
-// 2. Cobain tulis *logic* datanya di `app/database/seeders/UserSeeder.php`
+    // 2. Cobain tulis *logic* datanya di `app/database/seeders/UserSeeder.php`
 
-// 3. Jebreet! Suntik semua datanya!
-php backfire db:seed</code></pre>
+    // 3. Jebreet! Suntik semua datanya!
+    php backfire db:seed</code></pre>
 
 <?php elseif ($activeLine === 'orm'): ?>
     <h1>ORM Relationships (Silsilah Antartabel)</h1>
@@ -474,10 +474,10 @@ php backfire db:seed</code></pre>
 
     <p><b>Contoh Cara Pakenya:</b></p>
     <pre><code>// Panggil Si Fulan dari tabel User (Misal ID-nya 1)
-$user = User::find(1);
+    $user = User::find(1);
 
-// Ambil sekalian SEMUA koleksi tulisan Si Fulan dari tabel Post
-$posts = $user->hasMany(Post::class)->get();</code></pre>
+    // Ambil sekalian SEMUA koleksi tulisan Si Fulan dari tabel Post
+    $posts = $user->hasMany(Post::class)->get();</code></pre>
 
 <?php elseif ($activeLine === 'storage'): ?>
     <h1>File Storage (Gudang File)</h1>
@@ -485,21 +485,21 @@ $posts = $user->hasMany(Post::class)->get();</code></pre>
         API simpel nan aman biar kamu bisa asik nabung *file* di *server*.</p>
     <pre><code>use LunoxHoshizaki\Storage\Storage;
 
-// Simpen fotonya ke dalem folder `public/storage`
-Storage::put('avatars/1.jpg', $fileDataBinary);
+    // Simpen fotonya ke dalem folder `public/storage`
+    Storage::put('avatars/1.jpg', $fileDataBinary);
 
-// Dapet link lengkap buat nampilin fotonya ntar
-$url = Storage::url('avatars/1.jpg');
+    // Dapet link lengkap buat nampilin fotonya ntar
+    $url = Storage::url('avatars/1.jpg');
 
-// Buang *file* kalo udah nggak kepake
-Storage::delete('avatars/1.jpg');</code></pre>
+    // Buang *file* kalo udah nggak kepake
+    Storage::delete('avatars/1.jpg');</code></pre>
 
 <?php elseif ($activeLine === 'cli'): ?>
     <h1>Custom CLI Commands (Bikin Perintah Konsol Sendiri)</h1>
     <p>Males ngelakuin skrip *maintenance* harian gara-gara nggak bisa diklik dari *browser*? Pindahin ke *custom script* di
         konsol CLI-nya Backfire!</p>
     <pre><code>// Bikin cikal-bakal filenya dulu:
-php backfire make:command SendEmails</code></pre>
+    php backfire make:command SendEmails</code></pre>
     <p>Habis ketik perintah di atas, cek *folder* <code>app/Console/Commands/SendEmails.php</code>. Buka file-nya, isi
         *logic* rutinmu di dalem fungsi <code>handle()</code>, terus jalankan aja sesuka hatimu:</p>
     <pre><code>php backfire send:emails</code></pre>
@@ -514,13 +514,13 @@ php backfire make:command SendEmails</code></pre>
     <p>Sebelum mulai kirim-kiriman, pastiin kamu udah nyeting info SMTP di dalem dompet rahasia <code>.env</code> kamu ya:
     </p>
     <pre><code>MAIL_MAILER=smtp
-MAIL_HOST=sandbox.smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=isikan_username
-MAIL_PASSWORD=isikan_password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="hello@contoh.com"
-MAIL_FROM_NAME="Admin Baik Hati"</code></pre>
+    MAIL_HOST=sandbox.smtp.mailtrap.io
+    MAIL_PORT=2525
+    MAIL_USERNAME=isikan_username
+    MAIL_PASSWORD=isikan_password
+    MAIL_ENCRYPTION=tls
+    MAIL_FROM_ADDRESS="hello@contoh.com"
+    MAIL_FROM_NAME="Admin Baik Hati"</code></pre>
     <p>Kalo parameter <code>MAIL_MAILER</code> diisi <code>smtp</code>, sistem bakal otomatis ngelewatin jalur protokol SMTP
         yang stabil. Kalo nggak, dia bakal pake fungsi lawas <code>mail()</code> bawaan PHP.</p>
 
@@ -528,8 +528,8 @@ MAIL_FROM_NAME="Admin Baik Hati"</code></pre>
     <p>Meskipun jeroannya canggih, narik pelatuk buat ngirim emailnya tetep semanis biasanya kok:</p>
     <pre><code>use LunoxHoshizaki\Mail\Mail;
 
-// Terbang ke Kotak Masuk target dengan bawa file Class Mailable-mu
-Mail::to('user@contoh.com')->send(new WelcomeEmail());</code></pre>
+    // Terbang ke Kotak Masuk target dengan bawa file Class Mailable-mu
+    Mail::to('user@contoh.com')->send(new WelcomeEmail());</code></pre>
 
 <?php elseif ($activeLine === 'cache'): ?>
     <h1>Cache System (Penyimpanan Kilat)</h1>
@@ -537,11 +537,11 @@ Mail::to('user@contoh.com')->send(new WelcomeEmail());</code></pre>
         wajib nyimpen hasil prosesnya sementara via mekanisme <i>File Cache</i>!</p>
     <pre><code>use LunoxHoshizaki\Cache\Cache;
 
-// Nitip hasil *query* rumit ke cache dan pertahankan selama sejam (3600 detik)
-Cache::put('key_rahasia_data', 'NilaiDataYangBerat', 3600);
+    // Nitip hasil *query* rumit ke cache dan pertahankan selama sejam (3600 detik)
+    Cache::put('key_rahasia_data', 'NilaiDataYangBerat', 3600);
 
-// Lain kali, tarik aja dari cache biar ngebut (kalo kopong, keluarin 'default')
-$value = Cache::get('key_rahasia_data', 'default');</code></pre>
+    // Lain kali, tarik aja dari cache biar ngebut (kalo kopong, keluarin 'default')
+    $value = Cache::get('key_rahasia_data', 'default');</code></pre>
 
 <?php elseif ($activeLine === 'events'): ?>
     <h1>Events & Listeners (Siaran & Reseller)</h1>
@@ -549,11 +549,11 @@ $value = Cache::get('key_rahasia_data', 'default');</code></pre>
         (*Subscriber*). Kayak ngisi siaran radio lokal!</p>
     <pre><code>use LunoxHoshizaki\Events\Event;
 
-// Broadcast isyarat ke semesta kalo ada user baru daftar
-Event::dispatch(new UserRegistered($user));
+    // Broadcast isyarat ke semesta kalo ada user baru daftar
+    Event::dispatch(new UserRegistered($user));
 
-// Di sudut lain dunia kode, daftarin siapa aja yang kepo sama info tadi 
-Event::listen(UserRegistered::class, SendWelcomeEmail::class);</code></pre>
+    // Di sudut lain dunia kode, daftarin siapa aja yang kepo sama info tadi 
+    Event::listen(UserRegistered::class, SendWelcomeEmail::class);</code></pre>
 
 <?php elseif ($activeLine === 'security'): ?>
     <h1>Security Dasar</h1>
@@ -565,27 +565,27 @@ Event::listen(UserRegistered::class, SendWelcomeEmail::class);</code></pre>
         brutal nge-*request* lebih dari 60 kali semenit, bakal diblok sejenak.</p>
     <pre><code>use LunoxHoshizaki\Security\ThrottleRequests;
 
-Router::get('/api/data', [ApiController::class, 'index'])
-    ->middleware(ThrottleRequests::class);</code></pre>
+    Router::get('/api/data', [ApiController::class, 'index'])
+        ->middleware(ThrottleRequests::class);</code></pre>
     <p>Kalo kejadian, bakal dapet respon <code>429 Too Many Requests</code>.</p>
 
     <h2>Cross-Site Scripting (XSS)</h2>
     <p>Hati-hati waktu nampilin inputan dari *user* ke HTML. Selalu biasain pake helper <code>e()</code> bawaan ini buat
         nekan potensi injeksi *script* jahat:</p>
     <pre><code>&lt;!-- Rawan injeksi JS! --&gt;
-&lt;?= $user->bio ?&gt;
+    &lt;?= $user->bio ?&gt;
 
-&lt;!-- Aman, karakter HTML-nya di-escape --&gt;
-&lt;?= e($user->bio) ?&gt;</code></pre>
+    &lt;!-- Aman, karakter HTML-nya di-escape --&gt;
+    &lt;?= e($user->bio) ?&gt;</code></pre>
 
     <h2>Cross-Origin Resource Sharing (CORS)</h2>
     <p>Kalo API-mu mau diakses dari beda *domain* (misal pake React / Vue), kamu perlu ngebolehin *CORS*. Tinggal tambahin
         aja <code>CorsMiddleware</code> di rute yang butuh:</p>
     <pre><code>use LunoxHoshizaki\Security\CorsMiddleware;
 
-Router::group(['prefix' => '/api', 'middleware' => [CorsMiddleware::class]], function () {
-    Router::get('/users', [ApiController::class, 'users']);
-});</code></pre>
+    Router::group(['prefix' => '/api', 'middleware' => [CorsMiddleware::class]], function () {
+        Router::get('/users', [ApiController::class, 'users']);
+    });</code></pre>
 
     <h2>Secure HTTP Headers</h2>
     <p>Buat nambahin *header* pelindung bawaan standar (kayak anti *Clickjacking* atau *MIME sniffing*), pasang aja
@@ -593,8 +593,8 @@ Router::group(['prefix' => '/api', 'middleware' => [CorsMiddleware::class]], fun
     </p>
     <pre><code>use LunoxHoshizaki\Security\SecureHeadersMiddleware;
 
-Router::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(SecureHeadersMiddleware::class);</code></pre>
+    Router::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware(SecureHeadersMiddleware::class);</code></pre>
 
 <?php elseif ($activeLine === 'csrf'): ?>
     <h1>CSRF Protection</h1>
@@ -610,14 +610,14 @@ Router::get('/dashboard', [DashboardController::class, 'index'])
     <p>Pake fungsi *helper* <code>csrf_field()</code> buat otomatis nyetak input tersembunyi yang isinya token tersebut di
         dalam <i>form</i>:</p>
     <pre><code>&lt;form action="/posts/simpan" method="POST"&gt;
-    &lt;!-- Wajib ditaruh di dalam form! --&gt;
-    &lt;?= csrf_field() ?&gt;
+        &lt;!-- Wajib ditaruh di dalam form! --&gt;
+        &lt;?= csrf_field() ?&gt;
 
-    &lt;label&gt;Judul Tulisan:&lt;/label&gt;
-    &lt;input type="text" name="judul"&gt;
+        &lt;label&gt;Judul Tulisan:&lt;/label&gt;
+        &lt;input type="text" name="judul"&gt;
 
-    &lt;button type="submit"&gt;Posting&lt;/button&gt;
-&lt;/form&gt;</code></pre>
+        &lt;button type="submit"&gt;Posting&lt;/button&gt;
+    &lt;/form&gt;</code></pre>
 
     <h2>Kalo Lewat AJAX (Contoh pake Axios)</h2>
     <p>Kalo aplikasimu pake AJAX, kamu tetep harus ngirim token CSRF-nya ke *server*. Cara paling simpel, simpen token di
@@ -625,9 +625,9 @@ Router::get('/dashboard', [DashboardController::class, 'index'])
     <pre><code>&lt;meta name="csrf-token" content="&lt;?= $_SESSION['csrf_token'] ?? '' ?&gt;"&gt;</code></pre>
     <p>Baru ntar ditarik pake JavaScript dan dipasang di *Header* <code>X-CSRF-TOKEN</code> tiap nerbangin *request*:</p>
     <pre><code>// Contoh setup default di Axios
-let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-axios.defaults.headers.common['X-CSRF-TOKEN'] = token;</code></pre>
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = token;</code></pre>
 
 <?php elseif ($activeLine === 'request-response'): ?>
     <h1>Request & Response (Beri dan Terima)</h1>
@@ -638,16 +638,16 @@ axios.defaults.headers.common['X-CSRF-TOKEN'] = token;</code></pre>
     <p>Kelas sakti <code>LunoxHoshizaki\Http\Request</code> ngerangkum *file*, teks, sama info URL dari <i>user</i> biar
         gampang lu pretelin (entah dia datengnya dari metode GET bawaan link, atapun input balikan dari *form* POST).</p>
     <pre><code>public function store(Request $request)
-{
-    // Ambil data namanya (Ntar auto-nungguin input GET/POST sekalian)
-    $name = $request->input('name');
+    {
+        // Ambil data namanya (Ntar auto-nungguin input GET/POST sekalian)
+        $name = $request->input('name');
 
-    // Daripada panik datanya ngaco, setting aja alternatif *default*-nya disini (misal '18')
-    $age = $request->input('age', 18);
+        // Daripada panik datanya ngaco, setting aja alternatif *default*-nya disini (misal '18')
+        $age = $request->input('age', 18);
 
-    // Tamak pengen semuanya direbut jadi satu *Array* bundel?
-    $data = $request->all();
-}</code></pre>
+        // Tamak pengen semuanya direbut jadi satu *Array* bundel?
+        $data = $request->all();
+    }</code></pre>
 
     <h2>Ngeracik Paketan Balasan Utuh (Respon Kustom)</h2>
     <p>Emang sih Backfire pinter nerjemahin kembalikan `echo/return string` biasa jadi halaman jadi, kadang kan kita pengen
@@ -657,20 +657,20 @@ axios.defaults.headers.common['X-CSRF-TOKEN'] = token;</code></pre>
     <p>Di sinilah kelas <code>LunoxHoshizaki\Http\Response</code> beraksi unjuk gigi:</p>
     <pre><code>use LunoxHoshizaki\Http\Response;
 
-public function getJsonInfo()
-{
-    $response = new Response();
-    $response->setContent(json_encode([
-        'status' => 'success', 
-        'version' => '1.11.1'
-    ]));
+    public function getJsonInfo()
+    {
+        $response = new Response();
+        $response->setContent(json_encode([
+            'status' => 'success', 
+            'version' => '1.11.1'
+        ]));
 
-    // Bumbuin racikan tanggapanmu dengan Header JSON dan stempel kelulusan (201 Created)
-    $response->setHeader('Content-Type', 'application/json');
-    $response->setStatusCode(201);
+        // Bumbuin racikan tanggapanmu dengan Header JSON dan stempel kelulusan (201 Created)
+        $response->setHeader('Content-Type', 'application/json');
+        $response->setStatusCode(201);
 
-    return $response;
-}</code></pre>
+        return $response;
+    }</code></pre>
 
 <?php elseif ($activeLine === 'errors'): ?>
     <h1>Error Handling (Ngurusin Kalo Aplikasi Ngambek)</h1>
@@ -700,15 +700,15 @@ public function getJsonInfo()
     <p>Makanya Lunox punya pembaca <i>environment variables</i> tipe <code>.env</code>. Jadikan file gaib ini sebagai dompet
         utama hartamu ditaruh paling terluar di sarang aplikasimu.</p>
     <pre><code>APP_NAME="Lunox Backfire"
-APP_ENV=local
-APP_DEBUG=true
+    APP_ENV=local
+    APP_DEBUG=true
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=lunox_lite
-DB_USERNAME=root
-DB_PASSWORD=secret</code></pre>
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=lunox_lite
+    DB_USERNAME=root
+    DB_PASSWORD=secret</code></pre>
     <p>Tentu aja file harta karun <code>.env</code> ini otomatis udah ditebas dari ikutan *Commit* GitHub gara-gara ke-blok
         sama <code>.gitignore</code> sakti.</p>
 
@@ -718,11 +718,11 @@ DB_PASSWORD=secret</code></pre>
         <code>getenv()</code>:
     </p>
     <pre><code>// Menarik password dari balok brankas (Pakai String kosong '' jika ngaco datanya)
-$dbPass = $_ENV['DB_PASSWORD'] ?? '';
+    $dbPass = $_ENV['DB_PASSWORD'] ?? '';
 
-if ($_ENV['APP_ENV'] === 'production') {
-    // Gas ngebut jalankan script serius yang galak (Bukan mode main-main!)
-}</code></pre>
+    if ($_ENV['APP_ENV'] === 'production') {
+        // Gas ngebut jalankan script serius yang galak (Bukan mode main-main!)
+    }</code></pre>
 
 <?php elseif ($activeLine === 'artisan'): ?>
     <h1>Backfire Console (Sahabat Terminalmu)</h1>
