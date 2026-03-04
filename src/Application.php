@@ -140,7 +140,7 @@ class Application
         $exceptionToRender = $isProduction ? null : $e;
 
         try {
-            $content = \LunoxHoshizaki\View\View::make('errors.error', [
+            $content = \LunoxHoshizaki\View\View::make('basic.errors.error', [
                 'code' => $statusCode,
                 'message' => 'Internal Server Error',
                 'exception' => $exceptionToRender
@@ -176,7 +176,7 @@ class Application
     protected function renderMaintenanceMode(): void
     {
         try {
-            $content = \LunoxHoshizaki\View\View::make('errors.503');
+            $content = \LunoxHoshizaki\View\View::make('basic.errors.503');
             $response = new Response($content, 503);
             $response->send();
             return;

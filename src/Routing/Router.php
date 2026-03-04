@@ -59,7 +59,7 @@ class Router
     {
         // Internal method to add route
         $uri = rtrim($uri, '/') ?: '/';
-        
+
         static::$routes[$method][$uri] = [
             'action' => $action,
             'middlewares' => []
@@ -110,20 +110,20 @@ class Router
         foreach ($routes as $routeUri => $route) {
             $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-zA-Z0-9_-]+)', $routeUri);
             $pattern = str_replace('/', '\/', $pattern);
-            
+
             if (preg_match('/^' . $pattern . '$/', $uri, $matches)) {
                 // Filter out integer keys from matches
                 $params = array_filter($matches, function ($key) {
                     return !is_int($key);
                 }, ARRAY_FILTER_USE_KEY);
-                
+
                 return static::runRoute($request, $route, $params);
             }
         }
 
         // Custom 404 error page fallback
         try {
-            $content = \LunoxHoshizaki\View\View::make('errors.error', ['code' => 404]);
+            $content = \LunoxHoshizaki\View\View::make('basic.errors.error', ['code' => 404]);
             return new Response($content, 404);
         } catch (Exception $e) {
             return new Response('404 Not Found', 404);
