@@ -30,29 +30,32 @@ class Cache
 
     /**
      * Store an item in the cache for a given number of seconds.
+     * Uses JSON encoding instead of serialize() to prevent CWE-502 Object Injection.
      */
     public static function put(string $key, mixed $value, int $ttl = 3600): bool
     {
         $file = static::getFilePath($key);
         $data = [
             'expires_at' => time() + $ttl,
-            'value' => serialize($value)
+            'value' => json_encode($value)
         ];
         
-        return file_put_contents($file, serialize($data)) !== false;
+        return file_put_contents($file, json_encode($data), LOCK_EX) !== false;
     }
 
     /**
      * Retrieve an item from the cache.
+     * Uses JSON decoding (safe) instead of unserialize() (unsafe).
      */
     public static function get(string $key, mixed $default = null): mixed
     {
         $file = static::getFilePath($key);
         if (file_exists($file)) {
-            $data = unserialize(file_get_contents($file));
+            $raw = file_get_contents($file);
+            $data = json_decode($raw, true);
             
-            if (time() <= $data['expires_at']) {
-                return unserialize($data['value']);
+            if ($data && isset($data['expires_at']) && time() <= $data['expires_at']) {
+                return json_decode($data['value'], true);
             }
             
             // Cache expired
@@ -95,5 +98,22 @@ class Cache
             }
         }
         return $success;
+    }
+
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result.
+     */
+    public static function remember(string $key, int $ttl, callable $callback): mixed
+    {
+        $value = static::get($key);
+        
+        if ($value !== null) {
+            return $value;
+        }
+
+        $value = $callback();
+        static::put($key, $value, $ttl);
+        
+        return $value;
     }
 }

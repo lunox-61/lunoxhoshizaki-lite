@@ -65,7 +65,10 @@ class Auth
      */
     public static function login($user): void
     {
-        // Assuming the model sets the primary key to 'id' property
+        // CWE-384: Regenerate session ID to prevent Session Fixation
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
         $_SESSION['auth_user_id'] = $user->id;
     }
 
@@ -75,5 +78,9 @@ class Auth
     public static function logout(): void
     {
         unset($_SESSION['auth_user_id']);
+        // Regenerate session ID on logout to invalidate old session
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
     }
 }

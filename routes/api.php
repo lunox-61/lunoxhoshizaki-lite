@@ -9,35 +9,43 @@ use LunoxHoshizaki\Security\ApiAuthMiddleware;
  * API Routes
  * --------------------------------------------------------------------------
  * Here is where you can register API routes for your application.
- * All routes here should be prefixed with /api.
+ * All routes here are automatically prefixed with /api.
  */
 
-// Public API endpoints
-Router::get('/api/status', function() {
-    return [
-        'success' => true,
-        'message' => 'API is running smoothly.',
-        'version' => $_ENV['APP_VERSION'] ?? '1.2.0'
-    ];
-})->middleware([CorsMiddleware::class]);
+// Public API endpoints (CORS only)
+Router::prefix('/api')->middlewareGroup([CorsMiddleware::class])->group(function () {
 
-// Protected API endpoints (Require API_TOKEN)
-Router::get('/api/user', function($request) {
-    return [
-        'success' => true,
-        'data' => [
-            'id' => 1,
-            'name' => 'Lunox Hoshizaki',
-            'role' => 'Administrator'
-        ]
-    ];
-})->middleware([CorsMiddleware::class, ApiAuthMiddleware::class]);
+    Router::get('/status', function () {
+        return [
+            'success' => true,
+            'message' => 'API is running smoothly.',
+            'version' => $_ENV['APP_VERSION'] ?? '2.0.0'
+        ];
+    })->name('api.status');
 
-Router::post('/api/connect', function($request) {
-    $client = $request->input('client', 'Unknown');
-    return [
-        'success' => true,
-        'message' => "Successfully connected to {$_ENV['APP_NAME']} API.",
-        'client'  => $client
-    ];
-})->middleware([CorsMiddleware::class, ApiAuthMiddleware::class]);
+});
+
+// Protected API endpoints (CORS + API Token)
+Router::prefix('/api')->middlewareGroup([CorsMiddleware::class, ApiAuthMiddleware::class])->group(function () {
+
+    Router::get('/user', function ($request) {
+        return [
+            'success' => true,
+            'data' => [
+                'id' => 1,
+                'name' => 'Lunox Hoshizaki',
+                'role' => 'Administrator'
+            ]
+        ];
+    })->name('api.user');
+
+    Router::post('/connect', function ($request) {
+        $client = $request->input('client', 'Unknown');
+        return [
+            'success' => true,
+            'message' => "Successfully connected to {$_ENV['APP_NAME']} API.",
+            'client'  => $client
+        ];
+    })->name('api.connect');
+
+});

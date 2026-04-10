@@ -30,6 +30,7 @@ if (empty($args)) {
     echo "  make:controller    Create a new controller class\n";
     echo "  make:model         Create a new model class\n";
     echo "  make:middleware    Create a new middleware class\n";
+    echo "  make:request       Create a new form request class\n";
     echo "  make:migration     Create a new PHP migration file\n";
     echo "  migrate            Run all pending database migrations\n";
     echo "  make:seeder        Create a new database seeder class\n";
@@ -173,6 +174,54 @@ class {$name} implements MiddlewareInterface
 PHP;
         file_put_contents($path, $template);
         echo "✅ Middleware [src/Security/{$name}.php] created successfully.\n";
+        break;
+
+    case 'make:request':
+        if (empty($args)) {
+            echo "❌ Error: Request name is required. (e.g. php backfire make:request StoreUserRequest)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/app/Requests/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Request already exists.\n";
+            exit(1);
+        }
+        $dir = __DIR__ . '/app/Requests';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $template = <<<PHP
+<?php
+
+namespace App\Requests;
+
+use LunoxHoshizaki\Http\Request;
+
+class {$name} extends Request
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; // Change this to actual auth logic if needed
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            // 'name' => 'required|string|max:255',
+            // 'email' => 'required|email|unique:users,email',
+        ];
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ Request [app/Requests/{$name}.php] created successfully.\n";
         break;
 
     case 'make:command':

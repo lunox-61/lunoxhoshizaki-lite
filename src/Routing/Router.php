@@ -11,7 +11,7 @@ class Router
 {
     /**
      * Stored routes.
-     * Format: ['GET' => ['/path' => ['action' => ..., 'middlewares' => []]]]
+     * Format: ['GET' => ['/path' => ['action' => ..., 'middlewares' => [], 'name' => null]]]
      */
     protected static array $routes = [];
 
@@ -19,6 +19,16 @@ class Router
      * Set middlewares for the last registered route.
      */
     protected static array $lastRouteParams = [];
+
+    /**
+     * Named routes registry.
+     */
+    protected static array $namedRoutes = [];
+
+    /**
+     * Current group attributes stack (prefix, middleware).
+     */
+    protected static array $groupStack = [];
 
     /**
      * Register a GET route.
@@ -45,6 +55,14 @@ class Router
     }
 
     /**
+     * Register a PATCH route.
+     */
+    public static function patch(string $uri, array|Closure $action): static
+    {
+        return static::addRoute('PATCH', $uri, $action);
+    }
+
+    /**
      * Register a DELETE route.
      */
     public static function delete(string $uri, array|Closure $action): static
@@ -57,12 +75,17 @@ class Router
      */
     protected static function addRoute(string $method, string $uri, array|Closure $action): static
     {
-        // Internal method to add route
-        $uri = rtrim($uri, '/') ?: '/';
+        // Apply group prefix if any
+        $prefix = static::getCurrentPrefix();
+        $uri = rtrim($prefix . '/' . ltrim($uri, '/'), '/') ?: '/';
+
+        // Get group middlewares
+        $groupMiddlewares = static::getCurrentMiddlewares();
 
         static::$routes[$method][$uri] = [
             'action' => $action,
-            'middlewares' => []
+            'middlewares' => $groupMiddlewares,
+            'name' => null
         ];
 
         static::$lastRouteParams = ['method' => $method, 'uri' => $uri];
@@ -89,6 +112,131 @@ class Router
         }
 
         return $this;
+    }
+
+    /**
+     * Set a name for the previously registered route.
+     */
+    public function name(string $name): static
+    {
+        if (empty(static::$lastRouteParams)) {
+            return $this;
+        }
+
+        $method = static::$lastRouteParams['method'];
+        $uri = static::$lastRouteParams['uri'];
+
+        static::$routes[$method][$uri]['name'] = $name;
+        static::$namedRoutes[$name] = $uri;
+
+        return $this;
+    }
+
+    /**
+     * Define a group of routes that share attributes (prefix, middleware).
+     *
+     * Usage:
+     *   Router::prefix('/api')->middleware([...])->group(function() { ... });
+     *   Router::middleware([AuthMiddleware::class])->group(function() { ... });
+     *   Router::prefix('/admin')->group(function() { ... });
+     */
+    public function group(Closure $callback): void
+    {
+        $callback();
+
+        // Pop the current group off the stack after executing
+        array_pop(static::$groupStack);
+    }
+
+    /**
+     * Set prefix for a route group (static entry point).
+     */
+    public static function prefix(string $prefix): static
+    {
+        // Push a new group onto the stack
+        static::$groupStack[] = [
+            'prefix' => '/' . trim($prefix, '/'),
+            'middlewares' => []
+        ];
+
+        return new static;
+    }
+
+    /**
+     * Set middleware for a route group (static entry point).
+     * Can be called on its own or chained after prefix().
+     */
+    public static function middlewareGroup(string|array $middlewares): static
+    {
+        $middlewares = is_array($middlewares) ? $middlewares : [$middlewares];
+
+        // Check if there's already a group being built on the stack
+        if (!empty(static::$groupStack)) {
+            $lastIndex = count(static::$groupStack) - 1;
+            static::$groupStack[$lastIndex]['middlewares'] = array_merge(
+                static::$groupStack[$lastIndex]['middlewares'],
+                $middlewares
+            );
+        } else {
+            // Create new group entry
+            static::$groupStack[] = [
+                'prefix' => '',
+                'middlewares' => $middlewares
+            ];
+        }
+
+        return new static;
+    }
+
+    /**
+     * Get the current group prefix from the stack.
+     */
+    protected static function getCurrentPrefix(): string
+    {
+        $prefix = '';
+        foreach (static::$groupStack as $group) {
+            $prefix .= $group['prefix'] ?? '';
+        }
+        return $prefix;
+    }
+
+    /**
+     * Get the current group middlewares from the stack.
+     */
+    protected static function getCurrentMiddlewares(): array
+    {
+        $middlewares = [];
+        foreach (static::$groupStack as $group) {
+            $middlewares = array_merge($middlewares, $group['middlewares'] ?? []);
+        }
+        return $middlewares;
+    }
+
+    /**
+     * Resolve a named route URL, replacing parameters.
+     */
+    public static function route(string $name, array $params = []): string
+    {
+        if (!isset(static::$namedRoutes[$name])) {
+            throw new Exception("Route [{$name}] not defined.");
+        }
+
+        $uri = static::$namedRoutes[$name];
+
+        // Replace named parameters
+        foreach ($params as $key => $value) {
+            $uri = str_replace('{' . $key . '}', $value, $uri);
+        }
+
+        return $uri;
+    }
+
+    /**
+     * Get all registered routes (useful for debugging).
+     */
+    public static function getRoutes(): array
+    {
+        return static::$routes;
     }
 
     /**
@@ -147,6 +295,11 @@ class Router
                 $response = call_user_func_array([$controller, $method], array_merge([$request], $params));
             } else {
                 throw new Exception("Invalid route action.");
+            }
+
+            // Handle Redirect objects returned from controllers
+            if ($response instanceof \LunoxHoshizaki\Http\Redirect) {
+                $response->send();
             }
 
             if (!$response instanceof Response) {

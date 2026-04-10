@@ -26,6 +26,22 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         // Prevent leaking Referrer header strictly
         $response->setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
+        // Content Security Policy (OWASP A02, ISO A.8.26)
+        $csp = implode('; ', [
+            "default-src 'self'",
+            "script-src 'self'",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "font-src 'self' https://fonts.gstatic.com",
+            "img-src 'self' data:",
+            "frame-ancestors 'self'",
+            "base-uri 'self'",
+            "form-action 'self'"
+        ]);
+        $response->setHeader('Content-Security-Policy', $csp);
+
+        // Restrict access to browser features (Permissions-Policy)
+        $response->setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+
         // Strict Transport Security (HSTS) if HTTPS
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
             $response->setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

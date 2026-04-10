@@ -5,21 +5,24 @@ use App\Controllers\HomeController;
 use LunoxHoshizaki\Security\CsrfMiddleware;
 
 // Web Routes
-Router::get('/', [HomeController::class, 'index']);
-Router::get('/about', [HomeController::class, 'about']);
+Router::get('/', [HomeController::class, 'index'])->name('home');
+Router::get('/about', [HomeController::class, 'about'])->name('about');
 
-// Documentation Route
-Router::get('/docs', [\App\Controllers\DocsController::class, 'index']);
-Router::get('/docs/{page}', [\App\Controllers\DocsController::class, 'show']);
+// Documentation Route Group
+Router::prefix('/docs')->group(function () {
+    Router::get('/', [\App\Controllers\DocsController::class, 'index'])->name('docs.index');
+    Router::get('/{page}', [\App\Controllers\DocsController::class, 'show'])->name('docs.show');
+});
 
 // Protected POST route with CSRF
 Router::post('/submit', [HomeController::class, 'formSubmit'])
-    ->middleware([CsrfMiddleware::class]);
+    ->middleware([CsrfMiddleware::class])
+    ->name('form.submit');
 
 // Route to simulate a 500 Internal Server Error
 Router::get('/broken-route', function () {
     throw new Exception("Simulated Server Exception for testing!");
-});
+})->name('broken');
 
 // API Route Example
 Router::get('/api/users/{id}', function ($request, $id) {

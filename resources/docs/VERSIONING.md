@@ -34,6 +34,33 @@ Sangat direkomendasikan untuk mencatat apa saja yang berubah di file `CHANGELOG.
 **Contoh Format:**
 
 ```markdown
+## [2.0.0] - 2026-04-09
+### 🔴 Security (CRITICAL)
+- **[CWE-384]** Fixed session fixation vulnerability — `Auth::login()` and `logout()` now regenerate session ID via `session_regenerate_id(true)`.
+- **[CWE-502]** Replaced `unserialize()` with JSON encoding in Cache system to prevent PHP Object Injection / RCE.
+- **[OWASP A02]** Added `Content-Security-Policy` and `Permissions-Policy` headers to `SecureHeadersMiddleware`.
+
+### ⭐ Added
+- **[OWASP A09]** Logging System (`Log::info()`, `Log::error()`, etc) with daily rotation.
+- **[ISO A.8.24]** Hash Helper (`Hash::make()`, `Hash::check()`, `Hash::needsRehash()`) with Argon2ID/BCrypt support.
+- Route Grouping with shared middleware and prefix support (`Router::prefix()->group()`).
+- Named Routes with `->name()` and `route()` helper.
+- Typed Request methods: `->string()`, `->integer()`, `->boolean()`, `->file()`.
+- Automatic JSON body parsing for API endpoints.
+- Redirect helper (`redirect()`, `back()`) with flash session support.
+- 20+ additional validation rules (regex, unique, exists, date, url, boolean, array, numeric, etc).
+- Model enhancements (`whereIn`, `whereNull`, `whereRaw`, `leftJoin`, `$hidden`, `toArray`, `toJson`, `update`).
+- Advanced schema builder with `table()` alter support, `rename()`, `hasTable()`, `hasColumn()`.
+- Config Helper (`config()`) with dot notation.
+- Database Transactions (`DB::transaction()`).
+- New utility classes: `Str` and `Collection`.
+- New `make:request` CLI command.
+- Expanded global helpers (`route()`, `collect()`, `env()`, `now()`, `dd()`, `dump()`, `url()`, etc).
+
+### ⚠️ Breaking Changes
+- Cache now uses JSON encoding instead of PHP serialization. **Run `php backfire cache:clear` after upgrade.**
+- New CSP header may block inline scripts. Review if needed.
+
 ## [1.11.1] - 2026-03-03
 ### Security (ISO 27001 Patches)
 - **[A.14]** Bumped minimum PHP requirement to `^8.1` to mitigate EOL vulnerabilities.
