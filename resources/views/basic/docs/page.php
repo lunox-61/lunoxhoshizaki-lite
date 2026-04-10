@@ -5,116 +5,106 @@
 
 <?php if ($activeLine === 'installation'): ?>
     <h1>Installation & Architecture</h1>
-    <p>Halo coder! Selamat datang di Lunox Backfire. Ini adalah framework PHP eksperimental yang sengaja dibikin super
-        ngebut, tapi tetep ngasih kenyamanan nulis kode kayak di framework gede sekelas Laravel. <i>Guide</i> ini bakal
-        bantu kamu paham konsep dasarnya biar siap bikin aplikasi web kekinian yang kenceng dan aman.</p>
+    <p>Selamat datang di Lunox Backfire. Ini adalah framework PHP yang didesain agar ringan dan cepat, namun tetap memberikan alat dan struktur yang memudahkan pengembangan aplikasi web.</p>
 
     <h2>Cara Instal Framework</h2>
-    <p>Biar gampang, ikutin aja langkah-langkah <i>clone</i> dan *setup* awal dari skeleton GitHub
-        <b>lunoxhoshizaki-lite</b> ini:
+    <p>Untuk memulai, ikuti langkah-langkah instalasi awal dari repositori GitHub <b>lunoxhoshizaki-lite</b> berikut:
     </p>
 
     <p><b>1. Clone Repository</b></p>
-    <p>Kalo kamu pengen nama folder <i>project</i>-mu beda dari nama aslinya (misal mau dinamain <code>toko-online</code>
-        atau <code>my-app</code>), tambahin aja namanya di akhir perintah <code>git clone</code> kayak gini:</p>
+    <p>Jika Anda ingin nama direktori <i>project</i> berbeda, tambahkan namanya di akhir perintah <code>git clone</code>:</p>
     <pre><code># Format: git clone [URL_REPO] [NAMA_FOLDER_KAMU]
-    git clone https://github.com/lunox-61/lunoxhoshizaki-lite.git toko-online
-    cd toko-online</code></pre>
+    git clone https://github.com/lunox-61/lunoxhoshizaki-lite.git my-app
+    cd my-app</code></pre>
 
-    <p><b>2. Install Dependencies Pihak Ketiga</b></p>
-    <p>Sekarang jalanin perintah Composer buat nge-download semua pustaka pendukung (termasuk buat baca file <i>.env</i>):
+    <p><b>2. Install Dependencies</b></p>
+    <p>Jalankan perintah Composer untuk mengunduh seluruh pustaka pendukung:
     </p>
     <pre><code>composer install</code></pre>
 
     <p><b>3. Dump Autoload</b></p>
-    <p>Biar semua <i>class</i> PHP di framework ini bisa saling kenal dan keload dengan bener, jalanin ini:</p>
+    <p>Untuk memastikan semua <i>class</i> PHP dapat dimuat dengan baik, jalankan:</p>
     <pre><code>composer dump-autoload -o</code></pre>
 
-    <p><b>4. Bikin File Environment</b></p>
-    <p>Sistem Backfire baca konfigurasi sensitif dari file `.env`. Kita copy dulu dari file contoh yang udah ada:</p>
+    <p><b>4. Konfigurasi Environment</b></p>
+    <p>Salin file konfigurasi contoh ke `.env` agar sistem dapat membaca pengaturannya:</p>
     <pre><code>cp .env.example .env</code></pre>
 
     <h2>Syarat & Kebutuhan (Requirements)</h2>
-    <p>Karena framework ini pake fitur-fitur PHP lumayan baru, pastiin komputermu udah punya:</p>
+    <p>Pastikan sistem Anda sudah memenuhi persyaratan berikut:</p>
     <ul>
-        <li>PHP >= 8.1 (versi lebih baru makin bagus)</li>
-        <li>Tentu aja Ekstensi PDO & OpenSSL diaktifin</li>
-        <li>Database buat nyimpen data (MySQL / SQLite / MariaDB)</li>
+        <li>PHP >= 8.1</li>
+        <li>Ekstensi PDO (PHP Data Objects)</li>
+        <li>Ekstensi OpenSSL</li>
+        <li>Database SQL (MySQL / SQLite / MariaDB)</li>
     </ul>
 
     <h2>Struktur Folder Inti</h2>
-    <p>Abis diinstal, kamu bakal ngeliat folder-folder penting ini nih:</p>
+    <p>Berikut adalah komponen-komponen utama dalam struktur aplikasi:</p>
     <ul>
-        <li><b><code>app/</code></b> : Ini rumah buat aplikasimu. Semua <i>logic</i> utama (Models, Controllers, Events)
-            ditaroh di sini.</li>
-        <li><b><code>database/</code></b> : Tempat nyimpen file Migrations (buat bikin tabel database otomatis) dan Seeders
-            (buat nyuntik data boongan buat testing).</li>
-        <li><b><code>public/</code></b> : Pintu masuk utamanya (`index.php`). File-file CSS, JS, sama Gambar juga ditaroh di
-            sini aja.</li>
-        <li><b><code>resources/views/</code></b> : Nah, ini tempat naroh kode tampilan webnya (HTML / UI).</li>
-        <li><b><code>routes/</code></b> : Tempat nentuin list URL/link apa aja yang ada di websitemu (di
-            <code>web.php</code> atau <code>api.php</code>).
-        </li>
-        <li><b><code>src/</code></b> : <i>Ini Mesin Utama Framework-nya.</i> Mending jangan diotak-atik ya, kecuali kamu
-            niat banget pengen nyumbang kode ke <i>core</i>-nya!</li>
+        <li><b><code>app/</code></b> : Inti aplikasi Anda, memuat Models, Controllers, dan Events.</li>
+        <li><b><code>database/</code></b> : Direktori untuk file Migrations dan Seeders.</li>
+        <li><b><code>public/</code></b> : Pintu masuk aplikasi (`index.php`) dan tempat penyimpanan statik (CSS, JS, Images).</li>
+        <li><b><code>resources/views/</code></b> : File-file sistem templat tampilan (HTML/UI).</li>
+        <li><b><code>routes/</code></b> : Tempat mendaftarkan rute aplikasi (<code>web.php</code> atau <code>api.php</code>).</li>
+        <li><b><code>src/</code></b> : Kode pondasi dari framework itu sendiri.</li>
     </ul>
 
-    <h2>Jalanin Server di Laptopmu</h2>
-    <p>Pas lagi *development*, kamu nggak perlu repot-repot setup server berat kayak Apache/XAMPP. Backfire udah ada server
-        internal bawaan yang sat-set. Ketik aja ini di terminal:</p>
+    <h2>Menjalankan Development Server</h2>
+    <p>Anda dapat menjalankan server pengembangan internal bawaan PHP melalui perintah terminal ini:</p>
     <pre><code>php backfire serve</code></pre>
-    <p>Boom! Website kamu udah bisa diakses langsung lewat <code>http://localhost:8000</code>.</p>
+    <p>Aplikasi Anda dapat langsung diakses di <code>http://localhost:8000</code>.</p>
 
 <?php elseif ($activeLine === 'routing'): ?>
     <h1>Routing (Alur URL)</h1>
-    <p>Routing ini ibarat gerbang utama aplikasimu. Di sinilah kamu daftarin link/URL apa aja yang valid buat diakses
-        pengunjung, mau diarahkan ke file tampilan yang mana, atau mau ngeksekusi <i>logic</i> apa pas ditekan.</p>
+    <p>Routing mendefinisikan tautan (URL) yang diizinkan untuk diakses pada aplikasi beserta proses yang akan dijalankan ketika tautan tersebut dituju.</p>
 
     <h2>Basic Web Routing</h2>
-    <p>Semua URL/rute utama web kita simpen di file <code>routes/web.php</code>. Bikin *route* itu gampang banget, contohnya
-        gini buat ngembaliin teks atau manggil halaman tampilan (*View*):</p>
+    <p>Semua URL utama web disimpan di file <code>routes/web.php</code>. Berikut adalah contoh sederhana pengembalian teks sederhana:</p>
     <pre><code>use LunoxHoshizaki\Routing\Router;
 
     Router::get('/halo', function () {
         return 'Halo Dunia! Welcome!';
     });</code></pre>
 
-    <h2>Nangkep Data dari URL (Parameter)</h2>
-    <p>Kadang kita pengen bikin URL yang dinamis, misalnya URL profil user yang isinya beda-beda ID-nya. Gampang, tinggal
-        pake tanda kurung kurawal <code>{ }</code> aja:</p>
+    <h2>Routing dengan Parameter</h2>
+    <p>Untuk membuat URL dinamis yang menangkap data variabel, Anda bisa mendefinisikan parameter di antara kurung kurawal <code>{ }</code>:</p>
     <pre><code>Router::get('/user/{id}', function ($request, $id) {
         return 'Melihat Profil Pengguna dengan ID: ' . $id;
     });</code></pre>
 
-    <h2>Menangani POST, PUT, DELETE HTTP</h2>
-    <p>Untuk nerima data hasil *submit* dari form (formulir) HTML atau kalo kamu bikin REST API, kamu bisa pake metode yang
-        lain selain GET:</p>
+    <h2>HTTP Methods (POST, PUT, DELETE)</h2>
+    <p>Untuk menerima *request* manipulasi data dari form atau API, tersedia pendaftaran route untuk metode HTTP lainnya:</p>
     <pre><code>Router::post('/user/simpan', [UserController::class, 'store']);
     Router::put('/user/{id}/update', [UserController::class, 'update']);
     Router::delete('/user/{id}/hapus', [UserController::class, 'destroy']);</code></pre>
 
-    <h2>Ngelompokin URL (Grup & Middleware)</h2>
-    <p>Kalo kamu punya banyak rute yang butuh perlindungan (misalnya, cuma boleh diakses kalo udah login/admin), daripada
-        nulis satu-satu, mending masukin aja ke dalem grup kayak gini:</p>
-    <pre><code>Router::group(['prefix' => '/admin', 'middleware' => [AuthMiddleware::class]], function () {
-        Router::get('/dashboard', [AdminController::class, 'index']); // Jadinya: /admin/dashboard
-        Router::get('/setting', [AdminController::class, 'setting']); // Jadinya: /admin/setting
+    <h2>Route Grouping & Middleware</h2>
+    <p>Route dapat dikelompokkan bersama untuk berbagi konfigurasi perlindungan *middleware* atau *prefix* tanpa duplikasi kode:</p>
+    <pre><code>Router::prefix('/admin')
+        ->middleware([AuthMiddleware::class])
+        ->group(function () {
+            Router::get('/dashboard', [AdminController::class, 'index']); // Jadinya: /admin/dashboard
+            Router::get('/setting', [AdminController::class, 'setting']); // Jadinya: /admin/setting
     });</code></pre>
 
+    <h2>Named Routes (v2.0)</h2>
+    <p>Anda bisa menetapkan alias `->name()` pada suatu rute sehingga dapat lebih efisien ketika dipanggil fungsinya menggunakan *helper* `route()`:</p>
+    <pre><code>Router::get('/auth/login-karyawan-baru', [AuthController::class, 'login'])->name('login');
+
+    // Menghasilkan URL relatif:
+    echo route('login'); // Output: /auth/login-karyawan-baru</code></pre>
+
 <?php elseif ($activeLine === 'middleware'): ?>
-    <h1>Middleware (Si Tukang Jaga Pintu)</h1>
-    <p><i>Middleware</i> itu ibarat satpam yang ngecekin setiap <i>request</i> yang masuk atau keluar dari web kamu. Contoh
-        paling gampangnya, Backfire udah nyediain middleware buat ngecek apakah pengunjung udah login atau belum sebelum
-        mereka bisa buka halaman tertentu.</p>
+    <h1>Middleware</h1>
+    <p><i>Middleware</i> berfungsi sebagai filter yang memproses setiap <i>request</i> yang masuk sebelum mencapai logika aplikasi inti. Contohnya, middleware autentikasi akan memeriksa status login pengguna.</p>
 
-    <h2>Bikin Middleware Sendiri</h2>
-    <p>Mau bikin middleware baru? Nggak usah ngetik dari nol, pake aja perintah CLI `make:middleware` ini:</p>
+    <h2>Membuat Middleware Baru</h2>
+    <p>Kelas middleware dapat digenerate secara otomatis menggunakan perintah CLI:</p>
     <pre><code>php backfire make:middleware CheckAge</code></pre>
-    <p>Nanti bakal muncul file <i>class</i> `CheckAge` di dalem folder `app/Http/Middleware` (atau `app/Middleware`
-        tergantung *setup*-mu).</p>
+    <p>File ini akan dibuat pada <code>app/Http/Middleware</code> atau <code>app/Middleware</code>.</p>
 
-    <p>Nah, di dalem middleware itu, kamu tinggal nulis aturan utamanya di fungsi `handle`. Contohnya nih, kita mau nolak
-        bocil (di bawah 18 tahun) buat masuk:</p>
+    <p>Di dalam middleware, Anda dapat mendefinisikan logika kondisional pada metode `handle`:</p>
     <pre><code>namespace App\Middleware;
 
     use LunoxHoshizaki\Http\Request;
@@ -124,44 +114,38 @@
         public function handle(Request $request, \Closure $next)
         {
             if ($request->input('age') < 18) {
-                // Kalo di bawah umur, tendang balik ke home!
                 return redirect('/home');
             }
 
-            // Kalo aman, silakan masuk~
             return $next($request);
         }
     }</code></pre>
 
-    <h2>Daftarin & Pake Middleware</h2>
-    <p>Kalo file-nya udah jadi, kamu bisa langsung pasang satpam ini ke *route* tertentu di `routes/web.php` atau
-        `routes/api.php`.</p>
+    <h2>Mendaftarkan Middleware ke Route</h2>
+    <p>Terapkan kelas Middleware tersebut ke *route* di dalam `routes/web.php` atau `routes/api.php`.</p>
     <pre><code>use App\Middleware\CheckAge;
 
-    // Pasang satpam cuma di satu halaman ini aja
+    // Spesifik pada satu rute
     Router::get('/khusus-dewasa', function () {
-        return 'Selamat datang di area khusus!';
+        return 'Selamat datang!';
     })->middleware(CheckAge::class);
 
-    // Atau sekalian pasang satpam di satu blok grup halaman
-    Router::group(['prefix' => '/admin', 'middleware' => [CheckAge::class]], function () {
-        Router::get('/dashboard', [AdminController::class, 'index']); // Aman!
+    // Diimplementasikan pada grup rute tertentu
+    Router::prefix('/admin')->middleware([CheckAge::class])->group(function () {
+        Router::get('/dashboard', [AdminController::class, 'index']);
     });</code></pre>
 
 <?php elseif ($activeLine === 'controllers'): ?>
-    <h1>Controllers (Si Pengatur Lalu Lintas)</h1>
-    <p>Nulis semua kode ruwet di dalem file <code>web.php</code> itu ide buruk, nanti *file*-nya kepanjangan dan pusing
-        bacanya. Di sinilah <b>Controllers</b> beraksi! Controller itu semacam tempat buat ngumpulin *logic-logic* yang
-        sejenis biar rapi.</p>
+    <h1>Controllers</h1>
+    <p><b>Controllers</b> mengelompokkan logika penanganan permintaan HTTP yang terkait ke dalam sebuah kelas. Pendekatan ini menjaga alur logika agar terpisah dari pengaturan file <code>web.php</code>.</p>
 
-    <h2>Bikin Controller Baru</h2>
-    <p>Lagi-lagi, pake bantuan CLI Backfire aja biar cepet:</p>
+    <h2>Membuat Controller</h2>
+    <p>Gunakan perintah artisan *make*:</p>
     <pre><code>php backfire make:controller UserController</code></pre>
-    <p>Selesai! File baru langsung nongol di <code>app/Controllers/UserController.php</code>.</p>
+    <p>Ini membuat file persiapan di <code>app/Controllers/UserController.php</code>.</p>
 
-    <h2>Gimana Sih Bentuk Controller Itu?</h2>
-    <p>Biasanya, Controller itu tugasnya nerima *Request* (permintaan user), ngolah datanya, terus ngasih balikan berupa
-        HTML (<i>View</i>) atau format JSON (kalo bikin API):</p>
+    <h2>Struktur Dasar Controller</h2>
+    <p>Controller menerima iterasi dari object Request yang berisi data masukan dan merangkai balasan berupa Tampilan *View* (HTML) atau Respon JSON.</p>
     <pre><code>namespace App\Controllers;
 
     use LunoxHoshizaki\Http\Request;
@@ -170,142 +154,140 @@
 
     class UserController
     {
-        // Contoh nampilin halaman HTML profil user
+        // Menampilkan file View HTML User Profile
         public function show(Request $request, $id)
         {
             return View::make('user.profile', ['id' => $id]);
         }
 
-        // Contoh ngebalikin data JSON (Mantap buat bikin API Frontend)
+        // Contoh respons format JSON untuk arsitektur API
         public function getJson(Request $request)
         {
             $response = new Response();
-            $response->setContent(json_encode(['status' => 'success', 'data' => 'Data Rahasia']));
+            $response->setContent(json_encode(['status' => 'success']));
             $response->setHeader('Content-Type', 'application/json');
             return $response;
         }
     }</code></pre>
 
-    <h2>Nyambungin Controller ke Route</h2>
-    <p>Cara manggilnya di file rute gampang banget, tinggal tulis nama *Class Controller*-nya sama nama fungsinya di dalem
-        <i>Array</i>:
+    <h2>Menyambungkan Controller ke Route</h2>
+    <p>Metode pada Controller dipanggil dengan pendekatan berbasis *Array*:
     </p>
     <pre><code>Router::get('/user/{id}', [UserController::class, 'show']);</code></pre>
 
 <?php elseif ($activeLine === 'views'): ?>
     <h1>Views (Halaman Tampilan)</h1>
-    <p><i>Views</i> ini ibarat wajah aplikasimu. Tugas utamanya misahin kode PHP yang ribet sama kode HTML web biar
-        desainermu nggak pusing. Semua file tampilan dikumpulin di folder <code>resources/views</code>.</p>
+    <p><i>Views</i> berguna untuk merender antarmuka pengguna, memisahkan lapisan presentasi (HTML) dari logika bisnis (Controller/Models). File Views dipusatkan pada direktori <code>resources/views</code>.</p>
 
-    <h2>Manggil Tampilan ke Layar</h2>
-    <p>Kamu cuma butuh method <code>View::make</code> di dalem Controller buat muculin filenya (nggak usah nulis akhiran
-        <code>.php</code> ya):
+    <h2>Merender Views</h2>
+    <p>Tampilan dimuat melalui class bawaan <code>View::make</code>, ekstensi file <code>.php</code> tidak perlu disertakan.
     </p>
-    <pre><code>// Bakal manggil file resources/views/greeting.php
+    <pre><code>// Akan mereferensikan file resources/views/greeting.php
     return View::make('greeting', ['nama' => 'Budi']);</code></pre>
-    <p>Terus di dalem file <code>greeting.php</code>, bebas deh kamu cetak datanya (Ingat: usahain selalu pake helper
-        <code>e()</code> biar webmu kebal serangan XSS!):
+    <p>Variabel sisipan dapat dimanfaatkan di dalam `greeting.php` (Catatan: gunakan helper <code>e()</code> untuk mitigasi XSS):
     </p>
     <pre><code>&lt;h1&gt;Halo, &lt;?= e($nama) ?&gt;!&lt;/h1&gt;</code></pre>
 
-    <h2>Layouts (Biar Gak Nulis HTML Berulang)</h2>
-    <p>Pasti males kan nulis tag <code>&lt;head&gt;</code> atau navigasi menu berulang-ulang tiap ganti halaman? Tenang,
-        pake sistem *Template Inheritance* aja!</p>
+    <h2>Layouts (Templating System)</h2>
+    <p>Fitur <i>Template Inheritance</i> memudahkan Anda mereusibilitas bagian umum antarmuka (misal *Header* dan *Navigasi*).</p>
 
-    <p><b>1. Bikin Master Layout Dulu (misal di <code>resources/views/layouts/app.php</code>):</b></p>
+    <p><b>1. Pembuatan Master Template (Di <code>resources/views/layouts/app.php</code>):</b></p>
     <pre><code>&lt;html&gt;
-    &lt;head&gt;&lt;title&gt;Aplikasi Keren&lt;/title&gt;&lt;/head&gt;
+    &lt;head&gt;&lt;title&gt;Aplikasi Default&lt;/title&gt;&lt;/head&gt;
     &lt;body&gt;
-        &lt;!-- Ini titik tempat konten halaman bakal dimasukin --&gt;
+        &lt;!-- Titik pemanggilan area konten dinamis --&gt;
         &lt;?= $this-&gt;yieldContent('content') ?&gt;
     &lt;/body&gt;
     &lt;/html&gt;</code></pre>
 
-    <p><b>2. Pake Layoutnya di Halaman Lain:</b></p>
+    <p><b>2. Mengimplementasikan Layout di View Utama:</b></p>
     <pre><code>&lt;?php View::extends('layouts.app'); ?&gt;
 
     &lt;?php View::section('content'); ?&gt;
-        &lt;h1&gt;Hai, ini spesifik muncul di bagian dalem body lho!&lt;/h1&gt;
+        &lt;h1&gt;Isi konten eksklusif halaman ini.&lt;/h1&gt;
     &lt;?php View::endsection(); ?&gt;</code></pre>
 
 <?php elseif ($activeLine === 'database'): ?>
     <h1>Database & Models</h1>
-    <p>Lunox Backfire udah dibekali fitur <i>ActiveRecord</i> super simpel yang bakal ngurusin query database otomatis, jadi
-        kamu nggak perlu pusing ngetik perintah SQL manual panjang-panjang.</p>
+    <p>Lunox Backfire menyertakan pola desain dasar perangkat lunak <i>ActiveRecord</i> yang menyederhanakan cara Anda mengoperasikan baris basis data layaknya sebuah objek PHP biasa.</p>
 
-    <h2>Setting Koneksi Database</h2>
-    <p>Sebelum mulai main data, pastiin file <code>.env</code> kamu udah diisi info login yang bener sesuai sama server
-        MySQL di komputermu:</p>
+    <h2>Konfigurasi Database</h2>
+    <p>Detail koneksi disesuaikan ke dalam file *environment* <code>.env</code> konfigurasi Anda:</p>
     <pre><code>DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
     DB_PORT=3306
-    DB_DATABASE=lunox_lite
+    DB_DATABASE=db_name
     DB_USERNAME=root
-    DB_PASSWORD=rahasia</code></pre>
+    DB_PASSWORD=password</code></pre>
 
-    <h2>Bikin Model Buat Tabel</h2>
-    <p>Biasanya, tiap tabel di database itu diwakilin sama satu <b>Model</b>. Coba jalanin CLI Backfire ini:</p>
+    <h2>Pembuatan Model</h2>
+    <p>Perwakilan skema entitas data didukung melalui kelas <b>Model</b>. Gunakan instruksi CLI ini:</p>
     <pre><code>php backfire make:model Product</code></pre>
-    <p>Nah, otomatis Backfire bakal nyari tabel yang namanya jamak (bahasa Inggris) dari nama Modelnya (misal: <i>class</i>
-        `Product` bakal auto-nyambung ke tabel <code>products</code>).</p>
+    <p>Konvensi Backfire mendeteksi bentuk jamak dari nama Model sebagai target *Tabel database*-nya (misal: `Product` memetakan langsung ke struktur relasi tabel <code>products</code>).</p>
 
-    <h2>Operasi CRUD (Nambah, Baca, Edit, Hapus)</h2>
-    <p>Saking gampangnya, nyimpen baris data baru ke tabel tuh cuma gini doang:</p>
-    <pre><code>// CREATE: Buat nabung data baru
+    <h2>Operasi Dasar CRUD (Nambah, Baca, Edit, Hapus)</h2>
+    <p>Siklus pengolahan data standar dapat dilakukan tanpa pengetikan SQL manual:</p>
+    <pre><code>// CREATE: Menyisipkan Data Baru
     $produk = new Product();
-    $produk->name = 'Buku Panduan Ajaib';
+    $produk->name = 'Buku Panduan';
     $produk->price = 150000;
     $produk->save();
 
-    // READ: Ngambil data dari tabel
-    $satuProduk = Product::find(1); // Cuma ngambil yang ID-nya 1
+    // READ: Kueri Spesifik
+    $satuProduk = Product::find(1); 
     $semuaProduk = Product::where('price', '>', 50000)->get();
 
-    // UPDATE: Ngedit / ngerubah data lama
+    // UPDATE: Memperbaharui record yang diseleksi (Via instances)
     $produkLama = Product::find(1);
     $produkLama->price = 100000;
     $produkLama->save();
+    
+    // UPDATE CEPAT (Mengubah Nilai via Mass Assignment)
+    Product::where('category', 'book')->update(['discount' => 10]);
 
-    // DELETE: Ngehapus selamanya
+    // DELETE: Penghapusan basis data absolut atau sementara (SoftDeletes)
     $produkHapus = Product::find(2);
     $produkHapus->delete();</code></pre>
 
-    <h2>Lagi Mau Kueri Ribet? Pake Advanced Query Builder!</h2>
-    <p>Kalo kamu butuh narik data spesifik pake *sorting*, *limit*, sampe dibikin halaman-halaman otomatis (Paginasi) ala
-        Bootstrap 5:</p>
-    <pre><code>// Tarik data pake urutan dan batas
+    <h2>Query Builder Lanjutan</h2>
+    <p>Objek Query Model menyokong *sorting*, *limit*, maupun *Paginasi* langsung untuk pengolahan komprehensif:</p>
+    <pre><code>// Kueri yang memuat fungsi-fungsi kondisional lebih rinci (whereIn, whereNull, leftJoin)
     $terlaris = Product::query()
-        ->where('stock', '>', 0)
+        ->leftJoin('categories', 'products.cat_id', '=', 'categories.id')
+        ->whereIn('tags', ['book', 'pen', 'paper'])
+        ->whereNull('deleted_at')
         ->orderBy('sold_count DESC')
         ->limit(10)
         ->get();
 
-    // Otomatis mecah data jadi 15 barang per halaman
+    // Integrasi pemecahan kumpulan Array ke UI Halaman terputus (Paginasi)
     $semuaProduk = Product::paginate(15);
     </code></pre>
 
-    <p>Terus panggil fungsi jitu ini di file <i>View</i> kamu buat ngerender tombol-tombol halamannya:</p>
-    <pre><code>&lt;!-- Nampilin navigasi halaman (<< 1 2 3 >>) otomatis --&gt;
+    <p>Fungsi relasi pemecahan Paginasi itu diformulasikan langsung sebagai navigasi HTML (Bootstrap compatible):</p>
+    <pre><code>&lt;!-- Mencetak markup blok navigasi (<< 1 2 3 >>) otomatis --&gt;
     &lt;?= $semuaProduk-&gt;links() ?&gt;</code></pre>
 
 <?php elseif ($activeLine === 'validation'): ?>
-    <h1>Validation & Forms (Formulir Aman)</h1>
-    <p>Jangan pernah langsung percaya sama data yang dikirim user! Backfire punya fitur validasi bawaan di objek
-        <code>Request</code> buat nyaring isian <i>form</i> sebelum diproses ke database.
+    <h1>Validasi</h1>
+    <p>Prosedur memvalidasi permintaan yang dikirimkan oleh pengguna sangat dianjurkan untuk mendeteksi anomali pada masukan <i>form request</i>.
     </p>
 
-    <h2>Filter Request Masuk</h2>
-    <p>Kamu cuma perlu nentuin *rules* (aturan) apa aja yang wajib ditepatin sama inputan *user*:</p>
+    <h2>Validasi Objek Controller (v2.0)</h2>
+    <p>Atribut persyaratan diimplementasikan secara deskriptif untuk *Request object* meliputi verifikasi eksistensi isian, batasan String hingga keunikan format Tipe data:</p>
     <pre><code>public function store(Request $request)
     {
-        // Kalo ada yang kosong/salah, prosesnya langsung stop dan dibalikin ke form sebelumnya
+        // Validasi mencegah aliran di eksekusi lebih jauh dan memunculkan exception apabila nilai tak cocok
         $validated = $request->validate([
-            'title' => 'required|max:255',
-            'body'  => 'required',
-            'email' => 'required|email'
+            'title'     => 'required|max:255',
+            'body'      => 'required',
+            'email'     => 'required|email|unique:users,email', // Cek duplikasi di struktur tabel
+            'password'  => 'required|min:8',
+            'is_active' => 'boolean', // Identifikasi validasi format tipe biner
+            'website'   => 'url'
         ]);
 
-        // Kalo lolos validasi, baru lanjut simpen...
+        // Aliran akan melewati bagian ini hanya setelah rules disetujui.
         $post = new Post();
         $post->title = $validated['title'];
         $post->save();
@@ -313,205 +295,232 @@
         return redirect('/posts');
     }</code></pre>
 
-    <h2>Munculin Peringatan Merah di HTML</h2>
-    <p>Kalo *user* salah ngisi, sistem langsung nge-<i>flash</i> notifikasi pesannya ke Sesi. Pake Helper
-        <code>errors()</code> dan <code>old()</code> biar form-mu tetep estetik dan nggak ngeselin buat pengunjung:
+    <h2>Informasi Respon Error di View</h2>
+    <p>Jika pengguna melakukan kesalahan saat submisi form, *Error bag log* dicatat sekilas pada memori sesi. Helper bawaan
+        <code>errors()</code> dan <code>old()</code> disediakan untuk interaksi UI yang layak (misal tidak mengosongkan nilai yang pernah didikte pengguna):
     </p>
     <pre><code>&lt;form action="/simpan" method="POST"&gt;
-        &lt;!-- JANGAN LUPA! Selalu taruh anti-hack token ini di semua form! --&gt;
+        &lt;!-- Token keamanan minimal pelindung Form --&gt;
         &lt;?= csrf_field() ?&gt;
 
         &lt;label&gt;Judul:&lt;/label&gt;
-        &lt;!-- Biar user nggak capek ngetik ulang kalo filenya salah --&gt;
         &lt;input type="text" name="title" value="&lt;?= e(old('title')) ?&gt;"&gt;
 
-        &lt;!-- Misal error `title` muncul, kita cetak teks merah --&gt;
+        &lt;!-- Pemeriksaan logistik error 'title' apabila validasi dikembalikan sistem --&gt;
         &lt;?php if ($error = errors('title')): ?&gt;
-            &lt;div style="color:red;"&gt;Ups! &lt;?= $error ?&gt;&lt;/div&gt;
+            &lt;div style="color:red;"&gt;&lt;?= $error ?&gt;&lt;/div&gt;
         &lt;?php endif; ?&gt;
 
         &lt;button type="submit"&gt;Kirim Data&lt;/button&gt;
     &lt;/form&gt;</code></pre>
+    
+    <h2>Ekstraksi Validasi Form Khusus</h2>
+    <p>Untuk menyingkirkan logika berat di *Controller*, tersedia berkas kelas abstrak *FormRequest* dengan memanggil `php backfire make:request StoreDataRequest`.</p>
 
 <?php elseif ($activeLine === 'authentication'): ?>
-    <h1>Authentication (Sistem Login)</h1>
-    <p>Bikin fitur *login* dan *register* dari nol itu repot. Di Backfire, ada *Facade* `Auth` sederhana yang bisa dipakai
-        buat ngecek status *login* *user*.</p>
+    <h1>Autentikasi</h1>
+    <p>Sistem otentikasi konvensional dapat dengan mudah dikoordinir berbekal dukungan *Facade* `Auth` untuk keperluan fungsional memfasilitasi status Login pengguna.</p>
 
-    <h2>Daftar Member & Hashing Password</h2>
-    <p>Penting nih: jangan pernah nyimpen password mentah ke database. Selalu *hash* dulu pake fungsi bawaan
-        <code>password_hash()</code> bawaan PHP biar lebih aman:
+    <h2>Registrasi & Hashing Objek</h2>
+    <p>Dalam mendaftarkan akun baru, konversi Password standar diubah menggunakan <code>Hash::make()</code> berbasis ekstensi inti PHP (*Lihat sesi dokumentasi Hashing*):
     </p>
-    <pre><code>public function register(Request $request)
+    <pre><code>use LunoxHoshizaki\Security\Hash;
+
+    public function register(Request $request)
     {
         $validated = $request->validate([
-            'email'    => 'required|email',
+            'email'    => 'required|email|unique:users,email',
             'password' => 'required'
         ]);
 
         $user = new User();
         $user->email = $validated['email'];
-        // Hash password-nya pake algoritma default PHP (BCRYPT)
-        $user->password = password_hash($validated['password'], PASSWORD_DEFAULT);
+        $user->password = Hash::make($validated['password']);
         $user->save();
 
-        // Habis daftar, arahkan ke halaman login
         return redirect('/login');
     }</code></pre>
 
-    <h2>Coba Masuk (Auth Attempt)</h2>
-    <p>Kamu bisa pakai fungsi <code>Auth::attempt</code> buat nyocokin *email* dan *password* dari *form* dengan data di
-        *database*. Secara bawaan, ini bakal baca dari tabel <code>User</code>:</p>
+    <h2>Fase Logaritma Otentikasi</h2>
+    <p>Verifikasi kata sandi secara implisit terkelola tanpa *query* kompleks melalui <code>Auth::attempt</code>, yang terintegrasi secara teknis terhadap format tabel <code>User</code> bawaan:</p>
     <pre><code>use LunoxHoshizaki\Auth\Auth;
 
     if (Auth::attempt(['email' => $email, 'password' => $password])) {
-        // Kalo cocok, sesi login dibuat, lanjut ke halaman utama
         return redirect('/dashboard');
     } else {
-        // Kalo gagal, balikin lagi dengan pesan error
+        return redirect()->back()->withErrors(['message' => 'Email atau password salah.']);
     }</code></pre>
 
-    <h2>Ngecek Status Pengguna</h2>
-    <p>Setelah *user* login, kamu bisa panggil datanya di mana aja (Controller atau View) pake *Facade* <code>Auth</code>:
+    <h2>Pemanggilan Profil Login Singgah</h2>
+    <p>Entitas <code>Auth</code> membawakan akses membedah identitas pengguna di manapun *scoping* aplikasi berjalan:
     </p>
-    <pre><code>// Ngambil instance model User yang lagi login
+    <pre><code>// Ekstrak referensi instans User yang login di saat yang sama
     $user = Auth::user();
-    echo $user->email; // Contoh nampilin email
+    echo $user->email;
 
-    // Atau ngambil ID-nya aja
+    // Spesifik pencarian Integer penomoran ID
     $id = Auth::id();
 
-    // Buat ngecek simpel si user ini udah login belum
+    // Operasional pengecekan sederhana *boolean-check*
     if (Auth::check()) {
-        // Kalau udah
+        // Tervalidasi
     }</code></pre>
 
-    <h2>Kunci Halaman Pake Middleware</h2>
-    <p>Biar halaman rahasia (misal dasbor admin) nggak bisa diintip tamu, tempel aja gembok <code>AuthMiddleware</code> di
-        file *route* kamu:</p>
+    <h2>Membatasi Penetrasi Halaman Melalui Middleware</h2>
+    <p>Kombinasi rute privat (Contoh dasbor internal) dicegah akses tidak login-nya melalui injeksi *Class* <code>AuthMiddleware</code>:</p>
     <pre><code>Router::get('/profile', [ProfileController::class, 'show'])
     ->middleware(LunoxHoshizaki\Security\AuthMiddleware::class);</code></pre>
 
 <?php elseif ($activeLine === 'helpers'): ?>
-    <h1>Global Helpers & Sesi</h1>
-    <p>Backfire punya beberapa fungsi manja (*helpers*) yang bisa dipanggil kapan aja di manapun tanpa basa-basi *import
-        class* (apalagi pas di file View HTML).</p>
+    <h1>Global Helpers</h1>
+    <p>Berbagai fungsi bantuan (*helpers*) global mendistribusikan utilitas pengerjaan dasar di semua skope direktori untuk efisiensi akses logika tanpa harus selalu memanggil Namespace objek lengkap.</p>
 
     <ul>
-        <li><code>old('field_name')</code> : Mengembalikan tulisan yang sempet diketik user pas mereka disuruh balik ke form
-            gara-gara salah ngisi (biar mereka seneng nggak perlu ketik ulang dari nol).</li>
-        <li><code>errors('field_name')</code> : Manggil pesan *error* pas input *form* ditolak.</li>
-        <li><code>csrf_field()</code> : Tag wajib buat ditaruh di dalem form POST/PUT. Ini tameng gaib (Token) buat nendang
-            *hacker* iseng yang mau manipulasi isian website-mu.</li>
-        <li><code>e($string)</code> : Tameng lapis dua! Ini bakal nyapu bersih semua kode jahat (XSS) di teks sebelum nampil
-            ke layar. <b>Wajib pake ini tiap nyetak data nggak jelas dari *user*!</b></li>
-        <li><code>asset('css/style.css')</code> : Perpendek nulis jalur (URL) *absolute* buat manggil gambar atau file CSS
-            dari folder <code>public/</code>.</li>
+        <li><code>old('field_name')</code> : Mengembalikan riwayat masukan awal formulir tatkala fase proses input ditolak.</li>
+        <li><code>errors('field_name')</code> : Mendapatkan rangkaian nilai pesan kesalahan masukan validasi.</li>
+        <li><code>csrf_field()</code> : Men-generate HTML format elemen untuk kebutuhan intervensi serangan keamanan *form request*.</li>
+        <li><code>e($string)</code> : Mengonversi objek parameter ke *string HTML escape* yang aman diperlihatkan pada sistem templating.</li>
+        <li><code>asset('css/style.css')</code> : Konversi path dokumen absolut menuju sumber File Media pada jalur `public/`.</li>
+        <li><code>config('app.name')</code> : Pengambilan objek properti statis spesifik milik arsip pusat konfigurasi.</li>
+        <li><code>route('nama_rutemu')</code> : Menampilkan alamat URI berdasar atas penamaan rute.</li>
+        <li><code>now()</code> : Fungsi ekstraksi tanggal dan waktu lokal dari kapabelitas PHP (`Y-m-d H:i:s`).</li>
+        <li><code>dd($vars), dump($vars)</code> : *Utility tracer* pembantu saat *development* untuk memvisualisasi data koleksional.</li>
+        <li><code>collect($array)</code> : Mewakilkan *array format* awam ke kelas Collection yang memiliki ragam bantuan ekstensi pengkondisian iterasi.</li>
     </ul>
 
-    <p>Di balik layar, hal-hal keren tentang memori <i>flash</i> dan sesi ini dikelola sama tukang catat
-        <code>SessionManager</code> yang keamanannya (kriptografi cookie-nya) dijaga super ketat.
-    </p>
+<?php elseif ($activeLine === 'redirect'): ?>
+    <h1>Redirect (v2.0)</h1>
+    <p>Menavigasikan kemudi lalu lintas pengunjung bisa secara halus diperankan lewat asisten <code>Redirect</code> Helper.</p>
+    
+    <h2>Metode Penggunaan:</h2>
+    <pre><code>// Navigasi Standar URL Relatif
+    return redirect('/home');
+
+    // Menerjunkan pengunjung kembali menuju rute sebelumnya (Referer Tracker)
+    return redirect()->back();
+
+    // Memberikan paket sesi pesan Error Form dengan dukungan *input recovery*
+    return redirect()->back()
+        ->withErrors(['username' => 'Format masukan telah digunakan'])
+        ->withInput();
+
+    // Memberikan tanda *Flash Session* ke UI selanjutnya 
+    return redirect('/dashboard')->with('success_alert', 'Proses sinkronisasi data berhasil disahkan!');
+    </code></pre>
 
 <?php elseif ($activeLine === 'migrations'): ?>
     <h1>Database Migrations & Seeding</h1>
-    <p><i>Migrations</i> itu kayak Git (*Version Control System*) tapi khusus buat struktur tabel database. Jadi kamu bisa
-        ngerancang dan nge-<i>share</i> wujud tabel antarteman setim tanpa perlu oper-operan *file* SQL (yang sering lupa
-        di-<i>import</i>!).</p>
+    <p><i>Migrations</i> memberikan lapisan version control interaktif yang bertugas merancang modifikasi cetakan basis data berkesinambungan bagi semua tim *engineers* tanpa mengeksekusi operasi SQL tertulis manual.</p>
 
-    <h2>Siklus Bikin Tabel Database</h2>
-    <p>Gini cara bikin kerangka *table* pakai CLI Backfire:</p>
+    <h2>Siklus Cetakan Migrasi</h2>
+    <p>Deklarasi struktur rintisan tabel dibuat memakai konsole CLI:</p>
     <pre><code>php backfire make:migration create_flights_table</code></pre>
-    <p>Otomatis ada *file* baru dibuatin di folder <code>database/migrations/</code> lengkap sama cap waktunya. Tinggal
-        buka, terus atur mau ada kolom apa aja di fungsi penyetting <code>Schema::create</code>.</p>
+    <p>Hal ini memfasilitasi *draft* dengan tanggal identifikasi yang letaknya di `database/migrations/`. Silakan merekonstruksi skema kolom lewat properti abstrak <code>Schema::create</code>.</p>
 
-    <h2>Kayak Gini Nih Bentuknya</h2>
+    <h2>Contoh Referensi Konstruksi Schema (v2.0)</h2>
     <pre><code>use LunoxHoshizaki\Database\Schema\Schema;
     use LunoxHoshizaki\Database\Schema\Blueprint;
 
     public function up()
     {
+        // Menyediakan Cetakan Tabel
         Schema::create('flights', function (Blueprint $table) {
-            $table->id(); // Bikin ID Primary Key otomatis (INT AUTO_INCREMENT)
-            $table->string('name', 100); // Teks maksimal 100 huruf (VARCHAR)
-            $table->boolean('is_active'); // Bener atau salah (TINYINT)
-            $table->timestamps(); // Kasih info kapan dibuat & kapan diedit
-            $table->softDeletes(); // Fitur hapus pura-pura (deleted_at)
+            $table->id(); // Definisi Primary Key Intejer Bawan (AUTO_INCREMENT)
+            $table->string('name', 100); // Format Karakter limitasi (VARCHAR)
+            $table->boolean('is_active'); // Format Logika biner (TINYINT)
+            $table->timestamps(); // Mendata riwayat integrasi input model default
+            $table->softDeletes(); // Konfigurasi *Flagging deletion* via properti `deleted_at` 
+        });
+
+        // Contoh Alter/Modifikasi Kolom struktur tabel eksisting
+        Schema::table('flights', function (Blueprint $table) {
+            $table->renameColumn('is_active', 'status');
         });
     }</code></pre>
 
-    <h2>Eksekusi Migrasinya!</h2>
-    <p>Kalo desain tabelnya udah beres, suruh si Backfire ngerubah rengrengannya jadi wujud fisik tabel SQL dengan *command*
-        ini:</p>
+    <h2>Instruksi Mengeksekusi Migrasi Sistem</h2>
+    <p>Perintahkan *engine* CLI untuk mengubah kerangka struktur logikal file Migration tersebut ke operasi valid Database Engine:</p>
     <pre><code>php backfire migrate</code></pre>
 
-    <h2>Database Seeding (Suntik Data Massal)</h2>
-    <p>Pas lagi *coding*, kita kan pasti butuh banyak "dummy data" (data palsu) buat ngetes *layout*, kan? Daripada ngisi
-        manual lewat phpMyAdmin, biarin <i>Seeders</i> yang kerja kasar:</p>
-    <pre><code>// 1. Suruh Backfire buatin kerangka Seedernya
+    <h2>Database Seeding (Pengisian Data Sintetis)</h2>
+    <p>Kehadiran Seeder meminimalisir intervensi input basis data primitif pada awal pengembangan melalui sistem penyuntikan *Mockup array*.</p>
+    <pre><code>// 1. Deklarator Kerangka *Class*
     php backfire make:seeder UserSeeder
 
-    // 2. Cobain tulis *logic* datanya di `app/database/seeders/UserSeeder.php`
+    // 2. Tulis konstruksi Dummy record di `app/database/seeders/UserSeeder.php`
 
-    // 3. Jebreet! Suntik semua datanya!
+    // 3. Modul injeksi keseluruhan baris parameter tersebut
     php backfire db:seed</code></pre>
 
 <?php elseif ($activeLine === 'orm'): ?>
-    <h1>ORM Relationships (Silsilah Antartabel)</h1>
-    <p>Model di Lunox Backfire itu pinter, dia ngedukung relasi otomatis antar tabel yang saling nyambung. Jadi kamu nggak
-        usah lagi repot ngetik-ngetik SQL <code>LEFT JOIN</code> segala macem (misalnya narik data 1 User beserta info semua
-        Artikel/Post miliknya).</p>
+    <h1>Sistem Hubungan ORM</h1>
+    <p>Implementasi model entitas *ActiveRecord* mengelaborasi pola relasi tabel database secara dinamis sehingga menyederhanakan penarikan informasi <code>LEFT JOIN</code> terstruktur otomatis untuk skema antar-tabel.</p>
 
-    <h2>Relasi Apalagi yang Didukung?</h2>
+    <h2>Model Relasi Didukung</h2>
     <ul>
-        <li><code>hasOne(RelatedModel::class)</code>: Cuma punya relasi ke 1 data lain aja.</li>
-        <li><code>hasMany(RelatedModel::class)</code>: Ahli poligami, punya relasi ke banyak data lain.</li>
-        <li><code>belongsTo(RelatedModel::class)</code>: Mengklaim bagian dari tabel lain (Ini kebalikan dari
-            `hasOne`/`hasMany`).</li>
-        <li><code>belongsToMany(RelatedModel::class)</code>: Hubungan super rumit banyak-ke-banyak (Butuh campur tangan
-            tabel ketiga/<i>pivot</i> sebagai perantara).</li>
+        <li><code>hasOne(RelatedModel::class)</code>: Properti korelasi relasi tunggal eksklusif.</li>
+        <li><code>hasMany(RelatedModel::class)</code>: Entitas referensi dengan basis distribusi majemuk (Sistem List Data Induk-Anak).</li>
+        <li><code>belongsTo(RelatedModel::class)</code>: Mempresentasikan kepemilikan invers tunggal dari definisi relasi lain.</li>
+        <li><code>belongsToMany(RelatedModel::class)</code>: Hubungan skala besar majemuk (*Many-to-Many*), lazim mengaplikasikan integrasi *pivot table*.</li>
     </ul>
 
-    <p><b>Contoh Cara Pakenya:</b></p>
-    <pre><code>// Panggil Si Fulan dari tabel User (Misal ID-nya 1)
+    <p><b>Referensi Akses Data:</b></p>
+    <pre><code>// Identifikasi objek instance induk 
     $user = User::find(1);
 
-    // Ambil sekalian SEMUA koleksi tulisan Si Fulan dari tabel Post
+    // Kueri relasional mengaitkan properti fungsional array dari relasi terdaftar
     $posts = $user->hasMany(Post::class)->get();</code></pre>
 
+<?php elseif ($activeLine === 'db-transactions'): ?>
+    <h1>Database Transactions (v2.0)</h1>
+    <p>Sistem transaksi basis data memastikan keselamatan tahapan eksekusi logika mutasi berurutan agar jika ada parameter error tidak ada penyimpanan parsial di struktur database inti.</p>
+
+    <h2>Transaction Closure</h2>
+    <pre><code>use LunoxHoshizaki\Database\DB;
+
+    DB::transaction(function() {
+        // Proses Operasional Modifikasi Dana (1)
+        $dompet = Dompet::find(1);
+        $dompet->saldo -= 50000;
+        $dompet->save();
+
+        // Kueri Transaksi Pencatatan Sejarah (2)
+        $tagihan = new Tagihan();
+        $tagihan->nilai = 50000;
+        $tagihan->save();
+        
+        // *Proses komitasi akan divalidasi ketika tidak ada interupsi exception program*
+    });
+    </code></pre>
+
 <?php elseif ($activeLine === 'storage'): ?>
-    <h1>File Storage (Gudang File)</h1>
-    <p>Ngelola file upload dari *user* kadang bikin keringat dingin. Tenang aja, <i>class</i> <code>Storage</code> nyediain
-        API simpel nan aman biar kamu bisa asik nabung *file* di *server*.</p>
+    <h1>File Storage</h1>
+    <p>Intervensi sistem integrasi arsip dokumen dapat terbantu menggunakan fitur pendistribusian lokal sederhana dari kelas `Storage`.</p>
     <pre><code>use LunoxHoshizaki\Storage\Storage;
 
-    // Simpen fotonya ke dalem folder `public/storage`
+    // Penyimpanan statis fisik berbasis direktori `public/`
     Storage::put('avatars/1.jpg', $fileDataBinary);
 
-    // Dapet link lengkap buat nampilin fotonya ntar
+    // Pembuatan string referensi penautan web (URL Asset) untuk keperluan render halaman
     $url = Storage::url('avatars/1.jpg');
 
-    // Buang *file* kalo udah nggak kepake
+    // Fungsi pembersihan arsip secara presisi
     Storage::delete('avatars/1.jpg');</code></pre>
 
 <?php elseif ($activeLine === 'cli'): ?>
-    <h1>Custom CLI Commands (Bikin Perintah Konsol Sendiri)</h1>
-    <p>Males ngelakuin skrip *maintenance* harian gara-gara nggak bisa diklik dari *browser*? Pindahin ke *custom script* di
-        konsol CLI-nya Backfire!</p>
-    <pre><code>// Bikin cikal-bakal filenya dulu:
+    <h1>Pembuatan Perintah Terminal Kustom</h1>
+    <p>Rincian operasional rutin layaknya utilitas cron job latar belakang (*scripts maintenance*) dapat disusun pada unit CLI Command tertulis internal aplikasi.</p>
+    <pre><code>// Perintah generasi Kelas
     php backfire make:command SendEmails</code></pre>
-    <p>Habis ketik perintah di atas, cek *folder* <code>app/Console/Commands/SendEmails.php</code>. Buka file-nya, isi
-        *logic* rutinmu di dalem fungsi <code>handle()</code>, terus jalankan aja sesuka hatimu:</p>
+    <p>File basis perintah akan tercipta di <code>app/Console/Commands/SendEmails.php</code> untuk menampung argumen proses kompensasi data massal. Pemicu utama dijalankan berdasar inisiasi nama spesifik *command signiture*:</p>
     <pre><code>php backfire send:emails</code></pre>
 
 <?php elseif ($activeLine === 'mail'): ?>
-    <h1>Mailer System (Kirim-Kirim Email)</h1>
-    <p>Di Backfire, ngirim pesan penagihan, kode OTP, atau info diskon lewat "Mailable" itu asyiknya minta ampun. Apalagi
-        sekarang mesin utamanya udah di-<i>upgrade</i> pake <b>PHPMailer</b> biar lebih kebal blokir dan pastinya langsung
-        ngedukung SMTP!</p>
+    <h1>Mailer System</h1>
+    <p>Sistem transmisi surat terpaket *Mailable* difungsikan dalam menyajikan pesan faktur email konfirmasi dengan penataan layout tertata rapi memanfaatkan SMTP native dari library pendukung <b>PHPMailer</b>.</p>
 
-    <h2>Konfigurasi Dulu (File .env)</h2>
-    <p>Sebelum mulai kirim-kiriman, pastiin kamu udah nyeting info SMTP di dalem dompet rahasia <code>.env</code> kamu ya:
+    <h2>Konfigurasi Lingkungan Surat</h2>
+    <p>Kredensial infrastruktur pesan elektronik (*SMTP Mail*) berada pada area modifikasi di file `Environment` sentral:
     </p>
     <pre><code>MAIL_MAILER=smtp
     MAIL_HOST=sandbox.smtp.mailtrap.io
@@ -520,76 +529,82 @@
     MAIL_PASSWORD=isikan_password
     MAIL_ENCRYPTION=tls
     MAIL_FROM_ADDRESS="hello@contoh.com"
-    MAIL_FROM_NAME="Admin Baik Hati"</code></pre>
-    <p>Kalo parameter <code>MAIL_MAILER</code> diisi <code>smtp</code>, sistem bakal otomatis ngelewatin jalur protokol SMTP
-        yang stabil. Kalo nggak, dia bakal pake fungsi lawas <code>mail()</code> bawaan PHP.</p>
+    MAIL_FROM_NAME="Admin Notifikasi"</code></pre>
+    <p>Pengaturan format <code>MAIL_MAILER=smtp</code> menandakan alur kompensasi port berjamin server *Third-Party*, dan meniadakan penggunaan <code>mail()</code> murni di server aplikasi.</p>
 
-    <h2>Kirim Pesan Mailable</h2>
-    <p>Meskipun jeroannya canggih, narik pelatuk buat ngirim emailnya tetep semanis biasanya kok:</p>
+    <h2>Protokol Mengirim Email Format Mailable</h2>
     <pre><code>use LunoxHoshizaki\Mail\Mail;
 
-    // Terbang ke Kotak Masuk target dengan bawa file Class Mailable-mu
+    // Integrasi pemaketan file `class Mailable` kepada entitas alamat yang dirujuk
     Mail::to('user@contoh.com')->send(new WelcomeEmail());</code></pre>
 
+<?php elseif ($activeLine === 'logging'): ?>
+    <h1>Logging System (v2.0)</h1>
+    <p>Pencatatan rekap sirkulasi log vital program sistem tersimpan otomatis secara aman layaknya penanda rotasi harian dengan susunan `storage/logs/lunox-YYYY-MM-DD.log`.</p>
+
+    <h2>Sintaksis Peringatan Log</h2>
+    <pre><code>use LunoxHoshizaki\Log\Log;
+
+    // Log informasi normal dan sukses
+    Log::info('Aktivitas Login tercatat di sesi saat ini.', ['user_id' => 5]);
+
+    // Indikasi kesalahan interaksi non-fatal fungsional
+    Log::error('API Transaksi gagal membalas tiket.', ['respon_code' => 500]);
+
+    // Respon Kritis Kegagalan Fundamental
+    Log::critical('Interupsi Koneksi Database Engine!');
+    </code></pre>
+
 <?php elseif ($activeLine === 'cache'): ?>
-    <h1>Cache System (Penyimpanan Kilat)</h1>
-    <p>Kalo webmu nyangkut alias lemot merender karena ada tarikan kueri SQL raksasa, atau API sebelah lagi *down*, kamu
-        wajib nyimpen hasil prosesnya sementara via mekanisme <i>File Cache</i>!</p>
+    <h1>Sistem Cache</h1>
+    <p>Penyimpanan entitas berelasi besar dalam file statis memperingan sistem pembacaan kueri terdistribusi *Database server* selama skala rentang penahanan rotasi tertentu yang diatur.</p>
+    <p><b>SECURITY NOTE (V2.0):</b> Format skema integrasi *engine* pemanggil file Cache menggunakan standar JSON *encoder* yang terhindar dari pemanfaatan celah injeksi via modul pembawa `unserialize()`. Jalankan <code>php backfire cache:clear</code> pasca revisi versi.</p>
+    
     <pre><code>use LunoxHoshizaki\Cache\Cache;
 
-    // Nitip hasil *query* rumit ke cache dan pertahankan selama sejam (3600 detik)
-    Cache::put('key_rahasia_data', 'NilaiDataYangBerat', 3600);
+    // Memuat penahanan nilai informasi khusus sampai batasan kalkulasi (waktu detik)
+    Cache::put('key_rahasia_data', 'Sistem Konfigurasi Beban', 3600);
 
-    // Lain kali, tarik aja dari cache biar ngebut (kalo kopong, keluarin 'default')
+    // Identifikasi nilai objek dan penyertaan balasan alternatif (*Fallback parameter*)
     $value = Cache::get('key_rahasia_data', 'default');</code></pre>
 
 <?php elseif ($activeLine === 'events'): ?>
-    <h1>Events & Listeners (Siaran & Reseller)</h1>
-    <p>Biar isi program Controllermu nggak numpuk, pisahin logika sampingan ke teknik Pemancar (*Publisher*) dan Pendengar
-        (*Subscriber*). Kayak ngisi siaran radio lokal!</p>
+    <h1>Event Observers</h1>
+    <p>Isolasi logika bisnis ekstra (misal mengirim format faktur) dengan membagi instansi pemrograman pemancar (<i>Publisher Event Actions</i>) dan penerima intervensinya (*Listener*).</p>
     <pre><code>use LunoxHoshizaki\Events\Event;
 
-    // Broadcast isyarat ke semesta kalo ada user baru daftar
+    // Menciptakan pancaran pemicu event sistem
     Event::dispatch(new UserRegistered($user));
 
-    // Di sudut lain dunia kode, daftarin siapa aja yang kepo sama info tadi 
+    // Eksekutor pendaftar fungsi logis apabila interaksi rute spesifik terpancarkan 
     Event::listen(UserRegistered::class, SendWelcomeEmail::class);</code></pre>
 
 <?php elseif ($activeLine === 'security'): ?>
-    <h1>Security Dasar</h1>
-    <p>Biarpun ini framework simpel, Backfire udah dibekali beberapa lapis keamanan standar buat nutupin celah-celah umum
-        yang biasa diincer *bot*.</p>
+    <h1>Pemeliharaan Server Dasar</h1>
+    <p>Struktur model proteksi ISO dan mitigasi standar OWASP dapat diperbantukan pada level arsitektur middleware sistem aplikasi.</p>
 
-    <h2>Rate Limiting (Nahan Spam)</h2>
-    <p>Ada middleware <code>ThrottleRequests</code> yang bisa dipake buat ngebatasin *request*. Misalnya, kalo ada IP yang
-        brutal nge-*request* lebih dari 60 kali semenit, bakal diblok sejenak.</p>
+    <h2>Rate Limiting</h2>
+    <p>Lapisan *throttle* ditanamkan sebagai modul pengawasan jumlah lalu-lintas permintaan pada unit alamat IP tertentu; hal yang lazim digunakan demi proteksi DDoS (*Brute-force limit*).</p>
     <pre><code>use LunoxHoshizaki\Security\ThrottleRequests;
 
     Router::get('/api/data', [ApiController::class, 'index'])
         ->middleware(ThrottleRequests::class);</code></pre>
-    <p>Kalo kejadian, bakal dapet respon <code>429 Too Many Requests</code>.</p>
 
-    <h2>Cross-Site Scripting (XSS)</h2>
-    <p>Hati-hati waktu nampilin inputan dari *user* ke HTML. Selalu biasain pake helper <code>e()</code> bawaan ini buat
-        nekan potensi injeksi *script* jahat:</p>
-    <pre><code>&lt;!-- Rawan injeksi JS! --&gt;
-    &lt;?= $user->bio ?&gt;
-
-    &lt;!-- Aman, karakter HTML-nya di-escape --&gt;
+    <h2>Mitigasi XSS Injeksi</h2>
+    <p>Konversi rendering pengolahan karakter dari parameter eksternal dimuat melewati mekanisme mitigasi String dengan fungsi <code>e()</code> untuk meminimalisasi celah manipulasi skrip (*Cross-Site Scripting*).</p>
+    <pre><code>&lt;!-- Implementasi pelolosan yang sah format HTML --&gt;
     &lt;?= e($user->bio) ?&gt;</code></pre>
 
-    <h2>Cross-Origin Resource Sharing (CORS)</h2>
-    <p>Kalo API-mu mau diakses dari beda *domain* (misal pake React / Vue), kamu perlu ngebolehin *CORS*. Tinggal tambahin
-        aja <code>CorsMiddleware</code> di rute yang butuh:</p>
+    <h2>Pengaturan Identitas Skema CORS</h2>
+    <p>Rilis rute pada sistem luar beda lingkup Domain (Aplikasi UI *SPA* React dsb) dikelompokan di dalam fungsi pengawasan `CorsMiddleware`.</p>
     <pre><code>use LunoxHoshizaki\Security\CorsMiddleware;
 
-    Router::group(['prefix' => '/api', 'middleware' => [CorsMiddleware::class]], function () {
+    Router::prefix('/api')->middleware([CorsMiddleware::class])->group(function () {
         Router::get('/users', [ApiController::class, 'users']);
     });</code></pre>
 
-    <h2>Secure HTTP Headers</h2>
-    <p>Buat nambahin *header* pelindung bawaan standar (kayak anti *Clickjacking* atau *MIME sniffing*), pasang aja
-        <code>SecureHeadersMiddleware</code>:
+    <h2>Header Properti HTTP Lanjutan (v2.0)</h2>
+    <p>Protektif skema MIME Header (*CSP/ClickJacking*) secara mutlak diformat melalui rincian arsitektural *Class SecureHeadersMiddleware* yang dapat meredam manipulasi modifikasi akses browser tidak terverifikasi.
     </p>
     <pre><code>use LunoxHoshizaki\Security\SecureHeadersMiddleware;
 
@@ -597,20 +612,15 @@
         ->middleware(SecureHeadersMiddleware::class);</code></pre>
 
 <?php elseif ($activeLine === 'csrf'): ?>
-    <h1>CSRF Protection</h1>
-    <p>Buat nge-cegah serangan <b>Cross-Site Request Forgery (CSRF)</b> (serangan di mana *user* dipaksa ngeksekusi *action*
-        tanpa sadar), Backfire punya perlindungan bawaan menggunakan *token*.</p>
+    <h1>Proteksi CSRF</h1>
+    <p>Pengamanan formulir mencegah serangan kerentanan *Cross-Site Request Forgery (CSRF)* yang memungkinkan parameter rute di luar batas otorisasi pengguna ditransmisikan dan dimanipulasi.</p>
 
-    <h2>Gimana Cara Kerjanya?</h2>
-    <p>Waktu *session* aktif, sistem bakal nge-<i>generate</i> "CSRF Token" unik. Tiap kali ada *request* ubah data yang
-        pake *method* POST, PUT, atau DELETE, token ini wajib disertakan. Kalo nggak ada atau udan basi, proses bakal distop
-        pake pesan <code>419 Page Expired</code>.</p>
+    <h2>Mekanisme Alur Verifikasi Form</h2>
+    <p>Identifikasi log sesi secara tertutup mencatat kepemilikan string "Token CSRF". Validasi operasional *HTTP Method* modifikasi Data seperti baris PUT, POST dan DELETE diwajibkan menyertakan pengajuan Token tervalidasi yang relevan agar tak tertolak skema Respon <code>419 Expired</code>.</p>
 
-    <h2>Masukin Token di Template HTML</h2>
-    <p>Pake fungsi *helper* <code>csrf_field()</code> buat otomatis nyetak input tersembunyi yang isinya token tersebut di
-        dalam <i>form</i>:</p>
+    <h2>Menyiapkan Pengajuan Parameter HTML</h2>
+    <p>Elemen baris rahasia di dalam struktur cetakan formular didukung *Function Render* instansi token tersebut via sisipan <code>csrf_field()</code>:</p>
     <pre><code>&lt;form action="/posts/simpan" method="POST"&gt;
-        &lt;!-- Wajib ditaruh di dalam form! --&gt;
         &lt;?= csrf_field() ?&gt;
 
         &lt;label&gt;Judul Tulisan:&lt;/label&gt;
@@ -619,42 +629,111 @@
         &lt;button type="submit"&gt;Posting&lt;/button&gt;
     &lt;/form&gt;</code></pre>
 
-    <h2>Kalo Lewat AJAX (Contoh pake Axios)</h2>
-    <p>Kalo aplikasimu pake AJAX, kamu tetep harus ngirim token CSRF-nya ke *server*. Cara paling simpel, simpen token di
-        tag <code>&lt;meta&gt;</code> HTML:</p>
+    <h2>Konfigurasi Interaksi AJAX</h2>
+    <p>Transmisi formulir asinkron secara *Javascript API* mendukung parameter identifikasi referensi penempatan *meta-tags*.</p>
     <pre><code>&lt;meta name="csrf-token" content="&lt;?= $_SESSION['csrf_token'] ?? '' ?&gt;"&gt;</code></pre>
-    <p>Baru ntar ditarik pake JavaScript dan dipasang di *Header* <code>X-CSRF-TOKEN</code> tiap nerbangin *request*:</p>
-    <pre><code>// Contoh setup default di Axios
+    <p>Header pengajuan tersebut dimanfaatkan oleh integrasi arsitektur request kustom eksternal:</p>
+    <pre><code>// Modifikasi parameter *Header Request* di klien web
     let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     axios.defaults.headers.common['X-CSRF-TOKEN'] = token;</code></pre>
 
-<?php elseif ($activeLine === 'request-response'): ?>
-    <h1>Request & Response (Beri dan Terima)</h1>
-    <p>Ngoding Web itu ibarat interaksi ngobrol. Pihak pengunjung minta tolong (**Request**), server ngejawab sama respon
-        balik (**Response**).</p>
+<?php elseif ($activeLine === 'hashing'): ?>
+    <h1>Hashing (v2.0)</h1>
+    <p>Kelas Hash secara cerdas mengadaptasi algoritma kriptografi tercanggih berstandar (seperti Argon2Id atau BCrypt) dalam pengolahan hash yang aman.</p>
 
-    <h2>Nangkep Permohonan (Data Masuk)</h2>
-    <p>Kelas sakti <code>LunoxHoshizaki\Http\Request</code> ngerangkum *file*, teks, sama info URL dari <i>user</i> biar
-        gampang lu pretelin (entah dia datengnya dari metode GET bawaan link, atapun input balikan dari *form* POST).</p>
+    <h2>Format Otentikasi Terenkripsi</h2>
+    <pre><code>use LunoxHoshizaki\Security\Hash;
+
+    // Sistem secara otomatis mendeteksi penyandian terbaik kompilasi server PHP
+    $password_aman = Hash::make('P4ssw0rdKuat!');
+
+    // Konfirmasi keamanan integrasi algoritma sandi
+    if (Hash::check('P4ssw0rdKuat!', $password_aman)) {
+        echo "Valid Cuy!";
+    }
+    
+    // Mengevaluasi validitas format dan kecocokan algoritma sistem sekarang dengan format lawas
+    if (Hash::needsRehash($password_aman)) {
+        // Melakukan generate struktur kriptografi *Upgraded standard*
+    }
+    </code></pre>
+
+<?php elseif ($activeLine === 'str'): ?>
+    <h1>String Parsing <code>Str</code> (v2.0)</h1>
+    <p>Berbagai referensi standar manajemen kata logis diimplementasi di modul fasilitator utilitas fungsional *String Extractor* statis pada Class <code>Str</code>.</p>
+
+    <pre><code>use LunoxHoshizaki\Support\Str;
+
+    // Mutator properti baris kata pemformat URL
+    echo Str::slug('Pemformat Parameter URL'); // "pemformat-parameter-url"
+
+    // Standar pengacakan indeks acuan Identitas v4 Universial (UUID)
+    echo Str::uuid(); 
+
+    // Intervensi konversi tata teks program
+    echo Str::snake('UserControllerName'); // "user_controller_name"
+
+    // Limitator referensi kuantitas karakter awam pada suatu referensi *preview*
+    echo Str::limit('Pembatasan deskripsi tampilan antarmuka web sistem', 15); // "Pembatasan de..."
+    </code></pre>
+
+<?php elseif ($activeLine === 'collections'): ?>
+    <h1>Object Collections (v2.0)</h1>
+    <p>Utilitas Collection yang merangkul struktur data *Array Multidimensi* mendukung sintaks interaktif dengan antarmuka yang lebih tertata jika disejajarkan oleh skema nativ php.</p>
+
+    <h2>Fungsi Pemrosesan Integratif Set Matrix</h2>
+    <pre><code>// Konstruksi basis tabel matriks entri array terkelola
+    $data_kumpulan = [
+        ['id' => 1, 'nama' => 'Agus', 'skor' => 90],
+        ['id' => 2, 'nama' => 'Bambang', 'skor' => 50],
+        ['id' => 3, 'nama' => 'Budi', 'skor' => 70],
+    ];
+
+    // Interaksi abstraksi tipe formasi pengolahan himpunan data
+    $collection = collect($data_kumpulan);
+
+    // Kumpulan sintaks konversi yang di-chaining
+    $lulusan = $collection
+        ->where('skor', '>=', 70) 
+        ->sortBy('skor', true) 
+        ->pluck('nama') 
+        ->toArray();
+
+    dump($lulusan); // Array: ['Agus', 'Budi']
+    </code></pre>
+    
+    <p>Manajemen operasional himpunan terprogram mendukung fungsi standar industri lainnya meliputi: <code>map, filter, reduce, chunk, merge, keyBy, dll.</code></p>
+
+<?php elseif ($activeLine === 'request-response'): ?>
+    <h1>Representasi Request & Response</h1>
+    <p>Konfigurasi parameter web sistem diterjemah sebagai siklus dua entitas objek yakni parameter pengguna yang diminta (**Request**) dan bentuk respon (*Rendering/JSON*) antarmuka (**Response**).</p>
+
+    <h2>Intervensi Payload Request Data</h2>
+    <p>Instansiasi abstrak pada objek <code>LunoxHoshizaki\Http\Request</code> meredam kompleksitas pembacaan skrip URI secara konsisten dari skema eksekusi operasi HTTP Form Data maupun properti parameter navigasi link GET.</p>
+        
+    <h3>Bentuk Data Tipikal (v2.0 Feature)</h3>
+    <p>Fungsi tipikal pendefinisian permintaan difilter lebih awal (*Typecasting*) untuk keamanan konsistensi komparasi format basis data sistem yang ketat.</p>    
     <pre><code>public function store(Request $request)
     {
-        // Ambil data namanya (Ntar auto-nungguin input GET/POST sekalian)
-        $name = $request->input('name');
+        // Penerimaan konversi parameter teks dan mitigasi standar
+        $name = $request->string('name');
 
-        // Daripada panik datanya ngaco, setting aja alternatif *default*-nya disini (misal '18')
-        $age = $request->input('age', 18);
+        // Parameter numerikal murni dan pengaturan kompensitas `Default Constraint` (18)
+        $age = $request->integer('age', 18);
 
-        // Tamak pengen semuanya direbut jadi satu *Array* bundel?
-        $data = $request->all();
+        // Penerimaan tipe pemastian logika format spesifik bernilai Booleoan (`true`/`false`)
+        $is_agree = $request->boolean('terms_agreed');
+
+        // Referensi pembacaan alur arsip dokumen File Media fisik 
+        if ($request->hasFile('avatar')) {
+             // Operasional pergerakan Media
+        }
     }</code></pre>
 
-    <h2>Ngeracik Paketan Balasan Utuh (Respon Kustom)</h2>
-    <p>Emang sih Backfire pinter nerjemahin kembalikan `echo/return string` biasa jadi halaman jadi, kadang kan kita pengen
-        ngontrol detail format isinya (kayak mau *render* balikan mentah format JSON biar di-PDKT in sama API, lengkap sama
-        <i>Title Headers</i> aneh-aneh).
+    <h2>Inisiasi Format Sistem Respon Data Tervalidasi</h2>
+    <p>Rincian properti objek Respon memungkinkan pengalihan spesifik terhadap Header MIME *Status code* di mana format integrasi *Content-Type* spesifik dimanipulasi layaknya arsitektural API.
     </p>
-    <p>Di sinilah kelas <code>LunoxHoshizaki\Http\Response</code> beraksi unjuk gigi:</p>
     <pre><code>use LunoxHoshizaki\Http\Response;
 
     public function getJsonInfo()
@@ -662,10 +741,10 @@
         $response = new Response();
         $response->setContent(json_encode([
             'status' => 'success', 
-            'version' => '1.11.1'
+            'version' => '2.0.0'
         ]));
 
-        // Bumbuin racikan tanggapanmu dengan Header JSON dan stempel kelulusan (201 Created)
+        // Asosiasi tipe pengembalian dokumen yang diarahkan khusus *JSON-Only* (201 Eksekusi)
         $response->setHeader('Content-Type', 'application/json');
         $response->setStatusCode(201);
 
@@ -673,82 +752,68 @@
     }</code></pre>
 
 <?php elseif ($activeLine === 'errors'): ?>
-    <h1>Error Handling (Ngurusin Kalo Aplikasi Ngambek)</h1>
-    <p>Yang namanya *coding*, wajar kalo ada *error*. Tapi pas aplikasimu di-*deploy* (*Production*), pastinya kita nggak
-        mau *error traceback* yang isinya kode sensitif itu dilongok sama *user* atau orang iseng.</p>
+    <h1>Sistem Error Handler</h1>
+    <p>Resepsi konfigurasi rincian eksekutor kueri *Trace Exception* pada sistem *Production Environment Server* dialihkan layaknya notifikasi yang aman serta seragam dari visual pengguna akhir.</p>
 
-    <h2>Tampilan Error Otomatis</h2>
-    <p>Kalo ada *fatal error* atau *exception* yang nggak tertangani, sistem otomatis ngubah tampilannya jadi halaman
-        *error* simpel yang letaknya ada di <code>resources/views/errors/error.php</code>.</p>
-    <p>Beberapa *error* umum yang langsung ditangkep sama Backfire:</p>
+    <h2>Visual Konfigurasi Tampilan Otomatis</h2>
+    <p>Cakupan kesalahan referensial eksekusi parameter fatal diarahkan secara tunggal melingkungi *template view fallback* eksternal yang eksis pada <code>resources/views/errors/error.php</code>.</p>
     <ul>
-        <li><b>404 Not Found</b>: Kalo *user* ngetik URL ngasal, atau kamu nyari data ke *database* pake fungsi `find()`
-            yang kebetulan kosong.</li>
-        <li><b>500 Internal Error</b>: Pas ada kode PHP yang nggak jalan di server.</li>
-        <li><b>419 Page Expired</b>: Waktu token CSRF-nya lupa dipasang di form atau emang udah *expired*.</li>
-        <li><b>429 Too Many Requests</b>: Pas *Rate Limiter* nge-*detect* ada IP yang keseringan nge-*request*.</li>
+        <li><b>404 Tautan Tak Tersedia</b>: Tangkapan atas kegagalan eksistensi sistem dari *controller finder*.</li>
+        <li><b>500 Kegagalan Logika Mesin Server</b>: Pemroses kode bermasalah.</li>
+        <li><b>419 Kedaluwarsa Sesi</b>: Referensi CSRF *Token Timeout* yang ditahan.</li>
+        <li><b>429 Resepsi *Throttle* Terlampaui</b>: Notifikasi pembatasan integrasi masukan jaringan akses (*Rate Limit*).</li>
     </ul>
-    <p>*File template error* ini sengaja ditaruh di luar *core* biar kamu gampang ganti warnanya atau teks *error*-nya di
-        `resources/views/errors/error.php` sesuai <i>style</i> web-mu nanti.</p>
 
 <?php elseif ($activeLine === 'env'): ?>
-    <h1>Environment Configuration (.env)</h1>
-    <p>Menulis teks info rahasia (*Database Password*, *API Keys*, email *credentials*) bertelanjang dada di kode sumber
-        utama itu mengundang malaikat pencabut nyawa kalo kesebar publik di GitHub atau dicopet dari FTP server!</p>
+    <h1>Environment Base (.env)</h1>
+    <p>Abstraksi manajemen rahasia pengontrol pusat kredensial dipisahkan secara hierarki parameter dari entri program operasional koding (*source controller*).</p>
 
-    <h2>Ngumpetin Teks Sakral (.env File)</h2>
-    <p>Makanya Lunox punya pembaca <i>environment variables</i> tipe <code>.env</code>. Jadikan file gaib ini sebagai dompet
-        utama hartamu ditaruh paling terluar di sarang aplikasimu.</p>
-    <pre><code>APP_NAME="Lunox Backfire"
+    <h2>Deklarasi Konstanta Server Global</h2>
+    <p>Framework membedah konfigurasi dari komponen pembaca eksternal berformat isolasi root server <code>.env</code>.</p>
+    <pre><code>APP_NAME="Aplikasi Produksi"
     APP_ENV=local
     APP_DEBUG=true
 
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
     DB_PORT=3306
-    DB_DATABASE=lunox_lite
+    DB_DATABASE=db_core
     DB_USERNAME=root
     DB_PASSWORD=secret</code></pre>
-    <p>Tentu aja file harta karun <code>.env</code> ini otomatis udah ditebas dari ikutan *Commit* GitHub gara-gara ke-blok
-        sama <code>.gitignore</code> sakti.</p>
+    <p>Parameter sensitivitas dokumen dikecualikan dari komit repo utama via penyertaan di ekstensi <code>.gitignore</code> standar *security compliance*.</p>
 
-    <h2>Gimana Cara Nyelem Ngambil Datanya?</h2>
-    <p>Seketika framework hidup, si file dompet dikerok isinya dilebur masuk *super array*. Tarik aja datanya dari ujung
-        manapun file mu (contoh di *Controllers*) pake array bawaan sesepuh <code>$_ENV</code> atau manggil kakek
-        <code>getenv()</code>:
-    </p>
-    <pre><code>// Menarik password dari balok brankas (Pakai String kosong '' jika ngaco datanya)
-    $dbPass = $_ENV['DB_PASSWORD'] ?? '';
+    <h2>Sistem Penyaringan Variabel Properti Bawaan (v2.0)</h2>
+    <p>Prosedur utilitas sistem meniadakan kemungkinan eksistensi variabel kosong jika dimuat skriptual saat nilai terdegradasi / absen tanpa peredam eror *Fallback parameter* bawaan di dalam *array* sistem.</p>
+    
+    <pre><code>// Modifikasi penangkapan parameter sistem spesifik dari konfigurasi Environtment (*Helper*)
+    $secret = env('DB_PASSWORD', 'NilaiFallbackPenting');
 
-    if ($_ENV['APP_ENV'] === 'production') {
-        // Gas ngebut jalankan script serius yang galak (Bukan mode main-main!)
-    }</code></pre>
+    // Menarik hierarki manajemen Array asosiatif bertingkat dari folder Konfigurasi spesifik `.dot-syntax`
+    $namaWeb = config('app.name', 'Framework Ajib');
+    </code></pre>
 
 <?php elseif ($activeLine === 'artisan'): ?>
-    <h1>Backfire Console (Sahabat Terminalmu)</h1>
-    <p>Berkenalanlah sama <code>backfire</code> CLI, aplikasi utilitas sakti yang nongkrong anteng di depan garasi folder
-        aplikasimu, siap nge-bantu tugas kasar ketik-ngetik <i>file</i> bawaan.</p>
+    <h1>Interaksi Terminal Manajemen Konsol</h1>
+    <p>Sistem intervensi manajemen komando perintah *script executable* berjenis <code>backfire</code> berdiam sebagai basis aplikasi portabel pelaksana administrasi utiliatas pengembang (*Developer Toolbar CLI*).</p>
 
-    <h2>Ngebabu Apa Aja?</h2>
-    <p>Coba sapa *command launcher*-nya sama baris ini di jendela terminalmu:</p>
+    <h2>Sintaksis Manajemen Skrip Terminal</h2>
+    <p>Penginisialisasian utama intervensi operasi berjalan dieksekusi dengan *PHP Interpreter Engine* sebagai rintisan argumen di panel komando.</p>
     <pre><code>php backfire</code></pre>
 
-    <p>Nah ini dia kompilasi mantra-mantra CLI Backfire buat ngeringkas kerja keras mingguanmu jadi sekelebat kejapan mata
-        (Alias sulap <i>Generator File</i>):</p>
+    <p>Berikut adalah beberapa komponen instruksi *Scaffolding builder* (*File Generator Template*) yang disertakan untuk pemrosesan lebih ringkas:</p>
     <ul>
-        <li><code>php backfire make:controller AuthController</code> &rarr; Bim salabim merakit controller mentah</li>
-        <li><code>php backfire make:model Product</code> &rarr; Menyatukan kelas tabel <code>products</code></li>
-        <li><code>php backfire make:middleware VerifyToken</code> &rarr; Menyewa satpam pos ronda buat blokade *request*
+        <li><code>... make:controller DataController</code> &rarr; Membuat fondasi model klasifikasi controller rute program.</li>
+        <li><code>... make:request StoreDataRequest</code> &rarr; Pembangkit formulasi Custom Model Validator form input (v2.0 update).</li>
+        <li><code>... make:model LogSistem</code> &rarr; Menciptakan relasional sistem pembaca kelas Tabel (*Object Relational Mapping*).</li>
+        <li><code>... make:middleware UserScope</code> &rarr; Menghadirkan pengerjaan modul lapis filter pencegah intervensi akses log.
         </li>
-        <li><code>php backfire make:migration add_users_table</code> &rarr; Mencetak kertas biru denah fondasi MySQL baru
+        <li><code>... make:migration add_history_table</code> &rarr; Membentuk versi pemetaan kerangka tabel struktural rancang bangun MySQL Engine.
         </li>
-        <li><code>php backfire migrate</code> &rarr; Menyorong kertas desain tadi disulap jadi *Table beneran* via koneksi
-            database!</li>
-        <li><code>php backfire db:seed</code> &rarr; Menguyur banjir data masal mainan ke seisi database seketika</li>
-        <li><code>php backfire key:generate</code> &rarr; Merandom ulang kunci APP_KEY se-<i>secure</i> mungkin</li>
-        <li><code>php backfire cache:clear</code> &rarr; Mengguyur sampah <i>cache</i> agar beban tersendat lepas</li>
-        <li><code>php backfire serve</code> &rarr; Menghidupkan lokomotif PHP khusus menyala tanpa perlu setup rempong di
-            laptopmu</li>
+        <li><code>... migrate</code> &rarr; Menjalankan proses implementasi cetakan skema mutakhir pada pangkalan server database sentral.</li>
+        <li><code>... db:seed</code> &rarr; Memicu populasi sampel dummy rekam jejak masal terhadap parameter data lokal simulasi pengembangan.</li>
+        <li><code>... key:generate</code> &rarr; Mensinergi ulang pembuatan angka kunci basis aplikasi demi kriptografi internal teraman.</li>
+        <li><code>... cache:clear</code> &rarr; Merekonstruksi dan melegakan retensi ukuran berkas *data caching* stagnasi lama.</li>
+        <li><code>... serve</code> &rarr; Menjadi lokomotif pembantu simulasi Web Development Engine secara localhost.</li>
     </ul>
 
 <?php endif; ?>

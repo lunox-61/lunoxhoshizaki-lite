@@ -36,7 +36,13 @@ class DocsController
             'request-response' => 'Request & Response',
             'errors' => 'Error Handling',
             'env' => 'Environment Configuration',
-            'artisan' => 'Backfire CLI'
+            'artisan' => 'Backfire CLI',
+            'redirect' => 'Redirect',
+            'db-transactions' => 'DB Transactions',
+            'logging' => 'Logging',
+            'hashing' => 'Hashing',
+            'str' => 'String Helper',
+            'collections' => 'Collections'
         ];
 
         if (!array_key_exists($page, $pages)) {

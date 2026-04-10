@@ -56,6 +56,20 @@
         background-color: rgba(13, 110, 253, 0.05);
     }
 
+    /* v2.0 new badge */
+    .nav-badge-new {
+        display: inline-block;
+        font-size: 0.6rem;
+        font-weight: 700;
+        background: #0d6efd;
+        color: #fff;
+        padding: 0.1rem 0.35rem;
+        border-radius: 0.25rem;
+        vertical-align: middle;
+        margin-left: 4px;
+        letter-spacing: 0.03em;
+    }
+
     /* Content Formatting */
     .docs-content {
         padding-top: 1rem;
@@ -116,6 +130,19 @@
         border-radius: 0.25rem;
         font-size: 0.875em;
     }
+
+    /* v2.0 info/warning callouts */
+    .docs-callout {
+        border-left: 4px solid;
+        padding: 0.85rem 1.25rem;
+        border-radius: 0 0.5rem 0.5rem 0;
+        margin: 1.5rem 0;
+        font-size: 0.95rem;
+    }
+    .docs-callout-info  { border-color: #0d6efd; background: rgba(13,110,253,.07); }
+    .docs-callout-warn  { border-color: #ffc107; background: rgba(255,193,7,.08); }
+    .docs-callout-danger{ border-color: #dc3545; background: rgba(220,53,69,.07); }
+    .docs-callout strong { display: block; margin-bottom: .25rem; }
 </style>
 
 <div class="row">
@@ -135,40 +162,54 @@
                 href="/docs/controllers">Controllers</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'views' ? 'active' : ''; ?>"
                 href="/docs/views">Views</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'request-response' ? 'active' : ''; ?>"
+                href="/docs/request-response">Request &amp; Response</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'validation' ? 'active' : ''; ?>"
                 href="/docs/validation">Validation</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'authentication' ? 'active' : ''; ?>"
                 href="/docs/authentication">Authentication</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'helpers' ? 'active' : ''; ?>"
-                href="/docs/helpers">Helpers & Session</a>
+                href="/docs/helpers">Helpers &amp; Session</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'redirect' ? 'active' : ''; ?>"
+                href="/docs/redirect">Redirect <span class="nav-badge-new">v2</span></a>
 
             <h4 class="docs-nav-title">Database</h4>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'database' ? 'active' : ''; ?>"
-                href="/docs/database">Models & Active Record</a>
+                href="/docs/database">Models &amp; Active Record</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'migrations' ? 'active' : ''; ?>"
                 href="/docs/migrations">Database Migrations</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'orm' ? 'active' : ''; ?>" href="/docs/orm">ORM
                 Relationships</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'db-transactions' ? 'active' : ''; ?>"
+                href="/docs/db-transactions">DB Transactions <span class="nav-badge-new">v2</span></a>
 
             <h4 class="docs-nav-title">Services</h4>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'cache' ? 'active' : ''; ?>"
                 href="/docs/cache">Cache System</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'events' ? 'active' : ''; ?>"
-                href="/docs/events">Events & Listeners</a>
+                href="/docs/events">Events &amp; Listeners</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'storage' ? 'active' : ''; ?>"
                 href="/docs/storage">File Storage</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'mail' ? 'active' : ''; ?>"
                 href="/docs/mail">Mailer System</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'logging' ? 'active' : ''; ?>"
+                href="/docs/logging">Logging <span class="nav-badge-new">v2</span></a>
 
             <h4 class="docs-nav-title">Security</h4>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'security' ? 'active' : ''; ?>"
-                href="/docs/security">Feature Security & DDOS</a>
+                href="/docs/security">Feature Security &amp; DDOS</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'csrf' ? 'active' : ''; ?>"
                 href="/docs/csrf">CSRF Protection</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'hashing' ? 'active' : ''; ?>"
+                href="/docs/hashing">Hashing <span class="nav-badge-new">v2</span></a>
+
+            <h4 class="docs-nav-title">Utilities</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'str' ? 'active' : ''; ?>"
+                href="/docs/str">String Helper <span class="nav-badge-new">v2</span></a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'collections' ? 'active' : ''; ?>"
+                href="/docs/collections">Collections <span class="nav-badge-new">v2</span></a>
 
             <h4 class="docs-nav-title">Digging Deeper</h4>
-            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'request-response' ? 'active' : ''; ?>"
-                href="/docs/request-response">Request & Response</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'errors' ? 'active' : ''; ?>"
                 href="/docs/errors">Error Handling</a>
             <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'env' ? 'active' : ''; ?>"
