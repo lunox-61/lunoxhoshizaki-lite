@@ -193,22 +193,76 @@ class Request
      * Store an uploaded file to a given path.
      * Returns the stored filename on success, null on failure.
      */
-    public function storeFile(string $key, string $directory, ?string $filename = null): ?string
+    /**
+     * Allowed file extensions and their corresponding MIME types.
+     * Gap R1 Fix: CWE-434 – Unrestricted Upload of File with Dangerous Type.
+     * Satisfies: OWASP A04:2021, NIST SI-10, ISO A.8.28
+     */
+    protected static array $allowedMimeTypes = [
+        'jpg'  => ['image/jpeg'],
+        'jpeg' => ['image/jpeg'],
+        'png'  => ['image/png'],
+        'gif'  => ['image/gif'],
+        'webp' => ['image/webp'],
+        'svg'  => ['image/svg+xml'],
+        'pdf'  => ['application/pdf'],
+        'doc'  => ['application/msword'],
+        'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+        'xls'  => ['application/vnd.ms-excel'],
+        'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+        'txt'  => ['text/plain'],
+        'csv'  => ['text/csv', 'text/plain', 'application/csv'],
+        'zip'  => ['application/zip', 'application/x-zip-compressed'],
+    ];
+
+    /**
+     * Store an uploaded file to a given path.
+     * Validates extension and MIME type before storing.
+     * Returns the stored filename on success, null on failure.
+     *
+     * @param string   $key        Input field key from $_FILES
+     * @param string   $directory  Destination directory relative to /public/
+     * @param string|null $filename  Optional custom filename (without extension)
+     * @param array    $allowedExtensions  Override allowed extensions (e.g. ['jpg', 'png'])
+     */
+    public function storeFile(string $key, string $directory, ?string $filename = null, array $allowedExtensions = []): ?string
     {
         $file = $this->file($key);
         if (!$file) {
             return null;
         }
 
+        // --- R1: Extension Validation ---
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitted  = !empty($allowedExtensions)
+            ? $allowedExtensions
+            : array_keys(static::$allowedMimeTypes);
+
+        if (empty($extension) || !in_array($extension, $permitted, true)) {
+            return null; // Reject disallowed or missing extensions
+        }
+
+        // --- R1: MIME Type Validation (independent of client-supplied type) ---
+        $finfo         = new \finfo(FILEINFO_MIME_TYPE);
+        $detectedMime  = $finfo->file($file['tmp_name']);
+        $expectedMimes = static::$allowedMimeTypes[$extension] ?? [];
+
+        if (empty($expectedMimes) || !in_array($detectedMime, $expectedMimes, true)) {
+            return null; // Reject MIME type mismatch (e.g. .php disguised as .jpg)
+        }
+
+        // --- Build destination path ---
         $basePath = dirname(__DIR__, 2) . '/public/' . ltrim($directory, '/');
         if (!is_dir($basePath)) {
             mkdir($basePath, 0755, true);
         }
 
-        // Generate filename if not provided
+        // Generate a cryptographically random filename to prevent path guessing
         if (!$filename) {
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
             $filename = bin2hex(random_bytes(16)) . '.' . $extension;
+        } else {
+            // Sanitize provided filename: strip path traversal and re-attach extension
+            $filename = basename($filename) . '.' . $extension;
         }
 
         $destination = $basePath . '/' . $filename;
