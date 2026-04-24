@@ -1,5 +1,24 @@
 # Lunox Backfire v2 Update Notes
 
+## 🛡️ v2.1.0 - Security Hardening & Compliance Update (2026-04-13)
+
+Update **v2.1.0** berfokus pada penutupan *security gaps* untuk mematuhi standar ISO 27001, OWASP Top 10 (2021), dan NIST SP 800-53, menjadikan framework ini sangat aman untuk level *enterprise*.
+
+### Resolusi Keamanan Utama:
+1. **File Upload Security (R1):** Penguatan method `storeFile()` dengan *dual-validation*. Kini menggunakan `finfo` untuk mendeteksi *MIME type* asli dari file, plus validasi ekstensi berdasarkan *allowlist* internal (`$allowedMimeTypes`). Hal ini menambal celah CWE-434. (File: `src/Http/Request.php`)
+2. **Security Event Auto-Logging (R2):** Implementasi Audit Trail terotomatisasi. Seluruh percobaan login (sukses/gagal), logouts, dan *account lockout* otomatis dicatat via `Log`. (File: `src/Auth/Auth.php`)
+3. **Account Lockout Mechanism (R3):** Fitur pertahanan terhadap *Brute-Force* dan *Credential Stuffing* (CWE-307). Akun akan terkunci otomatis (15 menit) jika 5 kali gagal login. (File: `src/Auth/Auth.php`)
+4. **CORS Default Hardening (R4):** Pengaturan *Cross-Origin Resource Sharing* diperketat. *Wildcard* (`*`) dihilangkan sebagai default dan diganti menjadi larangan (*block-all*). Mendukung *dynamic origin resolution* dari variabel `.env` (`CORS_ALLOWED_ORIGIN`). (File: `src/Security/CorsMiddleware.php`)
+5. **Password Complexity & New Validation Rules (R5):** Penambahan *rules* validasi kuat bawaan:
+   - `password`: Validasi 8 karakter, kapital, huruf kecil, dan angka.
+   - `password_strength`: Sama seperti atas, namun min 12 karakter dan butuh karakter spesial (NIST AAL2+).
+   - `mimes` & `max_size`: Validasi ukuran dan ekstensi file langsung via `$request->validate()`. (File: `src/Validation/Validator.php`)
+6. **RBAC Foundation (R6):** Dasar Role-Based Access Control ditambahkan pada auth. Termasuk fungsi bawaan `Auth::hasRole()`, `Auth::can()`, `Auth::requireRole()`, dan `Auth::requirePermission()`. (File: `src/Auth/Auth.php`)
+
+---
+
+## 🚀 v2.0.0 - Major Refactoring & Features (2026-04-09)
+
 Pembaruan besar v2.0.0 (dirilis 2026-04-09) untuk codebase `lunoxhoshizaki-lite` membawa banyak refaktor dari segi keamanan, fitur inti framework, serta utilitas tambahan yang menjadikan framework ini lebih mendekati standar industri (mirip Laravel).
 
 Berikut adalah ringkasan terkait file apa saja yang berubah dan fitur-fitur baru yang ditambahkan:

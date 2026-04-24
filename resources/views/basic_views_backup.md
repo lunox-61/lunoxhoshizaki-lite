@@ -1,3 +1,54 @@
+# Backup of basic views
+
+## about.php
+
+```php
+<?php use LunoxHoshizaki\View\View; ?>
+<?php View:: extends('basic.layouts.app'); ?>
+
+<?php View::section('content'); ?>
+<div class="text-center py-5">
+    <h1 class="display-5 fw-bold mb-4 d-flex align-items-center justify-content-center gap-3">
+        <span class="material-symbols-outlined" style="font-size: 3rem;">info</span>
+        <?php echo htmlspecialchars($title ?? 'Tentang Kami'); ?>
+    </h1>
+    <p class="lead text-muted max-w-2xl mx-auto">
+        Framework ini tuh proyek MVC ringan yang dibikin fokus buat belajar konsep inti PHP modern. Alih-alih pakai
+        abstraksi ribet yang susah di-maintain, di sini semuanya dibikin simpel dan gampang dipahamin.
+    </p>
+    <div class="mt-5 row text-start justify-content-center">
+        <div class="col-md-4 mb-4">
+            <div class="p-4 bg-white rounded shadow-sm h-100 border">
+                <span class="material-symbols-outlined text-primary mb-2 fs-1">route</span>
+                <h5 class="fw-bold text-primary">Routing Simpel</h5>
+                <p class="text-muted small">Fitur routing dasar buat nyambungin URL langsung ke method controller atau
+                    closure dengan gampang dan santai.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="p-4 bg-white rounded shadow-sm h-100 border">
+                <span class="material-symbols-outlined text-success mb-2 fs-1">code_blocks</span>
+                <h5 class="fw-bold text-success">Arsitektur MVC Dasar</h5>
+                <p class="text-muted small">Punya struktur Model-View-Controller yang lurus-lurus aja buat ngebantu
+                    pisahin dan ngerapiihin logika aplikasimu.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="p-4 bg-white rounded shadow-sm h-100 border">
+                <span class="material-symbols-outlined text-warning mb-2 fs-1">html</span>
+                <h5 class="fw-bold text-warning">Templating View Sederhana</h5>
+                <p class="text-muted small">Udah disediain mesin bahasa template dasar ala Blade buat bikin HTML dinamis
+                    jadi lebih enak diliat dan bersih.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<?php View::endsection(); ?>
+```
+
+## docs/page.php
+
+```php
 <?php use LunoxHoshizaki\View\View; ?>
 <?php View:: extends('basic.layouts.docs'); ?>
 
@@ -819,3 +870,338 @@
 <?php endif; ?>
 
 <?php View::endsection(); ?>
+```
+
+## components/navbar.php
+
+```php
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+            <span class="material-symbols-outlined text-primary">rocket_launch</span>
+            <?php echo $_ENV['APP_NAME'] ?? 'Lunox Backfire'; ?>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center gap-1" href="/"><span class="material-symbols-outlined fs-5">home</span> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center gap-1" href="/about"><span class="material-symbols-outlined fs-5">info</span> About</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+```
+
+## layouts/app.php
+
+```php
+<?php use LunoxHoshizaki\View\View; ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Lunox Hoshizaki">
+    <title><?php echo htmlspecialchars($title ?? $_ENV['APP_NAME'] ?? 'Lunox Backfire'); ?></title>
+    <!-- Google Fonts: Google Sans Flex and Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,100..1000&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Google Sans Flex', system-ui, -apple-system, sans-serif;
+            color: #333;
+        }
+
+        .main-content {
+            min-height: calc(100vh - 140px);
+            padding: 40px 0;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .material-symbols-outlined {
+            vertical-align: middle;
+            line-height: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <?php View::component('basic.components.navbar'); ?>
+
+    <main class="main-content container">
+        <?php View::yield('content'); ?>
+    </main>
+
+    <footer class="bg-dark text-light py-4 mt-auto">
+        <div class="container text-center">
+            <p class="mb-0">&copy; <?php echo date('Y'); ?>
+                <strong><?php echo $_ENV['APP_NAME'] ?? 'Lunox Backfire'; ?></strong>
+                v<?php echo $_ENV['APP_VERSION'] ?? '1.1.0'; ?>. Designed by Lunox Hoshizaki.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+```
+
+## layouts/docs.php
+
+```php
+<?php use LunoxHoshizaki\View\View; ?>
+<?php View:: extends('basic.layouts.app'); ?>
+
+<?php View::section('content'); ?>
+<style>
+    /* Docs specific styling bridging standard layout */
+    .docs-sidebar {
+        /* In an actual implementation this might need an offset for a fixed navbar,
+           but our navbar currently is static. We'll add some top padding. */
+        padding-top: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .docs-sidebar {
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+    }
+
+    .docs-nav-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #343a40;
+        margin-bottom: 0.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .docs-nav-title:first-child {
+        margin-top: 0;
+    }
+
+    .docs-nav-link {
+        color: #6c757d;
+        text-decoration: none;
+        display: block;
+        padding: 0.4rem 0;
+        border-left: 2px solid transparent;
+        padding-left: 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .docs-nav-link:hover {
+        color: #212529;
+        border-left-color: #dee2e6;
+    }
+
+    .docs-nav-link.active {
+        color: #0d6efd;
+        font-weight: 600;
+        border-left-color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+
+    /* v2.0 new badge */
+    .nav-badge-new {
+        display: inline-block;
+        font-size: 0.6rem;
+        font-weight: 700;
+        background: #0d6efd;
+        color: #fff;
+        padding: 0.1rem 0.35rem;
+        border-radius: 0.25rem;
+        vertical-align: middle;
+        margin-left: 4px;
+        letter-spacing: 0.03em;
+    }
+
+    /* Content Formatting */
+    .docs-content {
+        padding-top: 1rem;
+        padding-bottom: 4rem;
+    }
+
+    .docs-content h1 {
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        font-size: 2.5rem;
+        color: #212529;
+    }
+
+    .docs-content h2 {
+        font-weight: 700;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        font-size: 1.75rem;
+    }
+
+    .docs-content h3 {
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+        font-size: 1.25rem;
+    }
+
+    .docs-content p {
+        line-height: 1.7;
+        color: #495057;
+        margin-bottom: 1.25rem;
+    }
+
+    .docs-content ul {
+        color: #495057;
+        margin-bottom: 1.25rem;
+    }
+
+    .docs-content li {
+        margin-bottom: 0.5rem;
+    }
+
+    .docs-content pre {
+        background: #212529 !important;
+        color: #f8f9fa !important;
+        padding: 1.25rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .docs-content code:not(pre code) {
+        background-color: #e9ecef;
+        color: #d63384;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-size: 0.875em;
+    }
+
+    /* v2.0 info/warning callouts */
+    .docs-callout {
+        border-left: 4px solid;
+        padding: 0.85rem 1.25rem;
+        border-radius: 0 0.5rem 0.5rem 0;
+        margin: 1.5rem 0;
+        font-size: 0.95rem;
+    }
+    .docs-callout-info  { border-color: #0d6efd; background: rgba(13,110,253,.07); }
+    .docs-callout-warn  { border-color: #ffc107; background: rgba(255,193,7,.08); }
+    .docs-callout-danger{ border-color: #dc3545; background: rgba(220,53,69,.07); }
+    .docs-callout strong { display: block; margin-bottom: .25rem; }
+</style>
+
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 d-none d-md-block docs-sidebar border-end pe-3">
+        <nav class="nav flex-column mb-5">
+            <h4 class="docs-nav-title">Prologue</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'installation' ? 'active' : ''; ?>"
+                href="/docs/installation">Installation</a>
+
+            <h4 class="docs-nav-title">The Basics</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'routing' ? 'active' : ''; ?>"
+                href="/docs/routing">Routing</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'middleware' ? 'active' : ''; ?>"
+                href="/docs/middleware">Middleware</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'controllers' ? 'active' : ''; ?>"
+                href="/docs/controllers">Controllers</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'views' ? 'active' : ''; ?>"
+                href="/docs/views">Views</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'request-response' ? 'active' : ''; ?>"
+                href="/docs/request-response">Request &amp; Response</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'validation' ? 'active' : ''; ?>"
+                href="/docs/validation">Validation</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'authentication' ? 'active' : ''; ?>"
+                href="/docs/authentication">Authentication</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'helpers' ? 'active' : ''; ?>"
+                href="/docs/helpers">Helpers &amp; Session</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'redirect' ? 'active' : ''; ?>"
+                href="/docs/redirect">Redirect <span class="nav-badge-new">v2</span></a>
+
+            <h4 class="docs-nav-title">Database</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'database' ? 'active' : ''; ?>"
+                href="/docs/database">Models &amp; Active Record</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'migrations' ? 'active' : ''; ?>"
+                href="/docs/migrations">Database Migrations</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'orm' ? 'active' : ''; ?>" href="/docs/orm">ORM
+                Relationships</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'db-transactions' ? 'active' : ''; ?>"
+                href="/docs/db-transactions">DB Transactions <span class="nav-badge-new">v2</span></a>
+
+            <h4 class="docs-nav-title">Services</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'cache' ? 'active' : ''; ?>"
+                href="/docs/cache">Cache System</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'events' ? 'active' : ''; ?>"
+                href="/docs/events">Events &amp; Listeners</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'storage' ? 'active' : ''; ?>"
+                href="/docs/storage">File Storage</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'mail' ? 'active' : ''; ?>"
+                href="/docs/mail">Mailer System</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'logging' ? 'active' : ''; ?>"
+                href="/docs/logging">Logging <span class="nav-badge-new">v2</span></a>
+
+            <h4 class="docs-nav-title">Security</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'security' ? 'active' : ''; ?>"
+                href="/docs/security">Feature Security &amp; DDOS</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'csrf' ? 'active' : ''; ?>"
+                href="/docs/csrf">CSRF Protection</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'hashing' ? 'active' : ''; ?>"
+                href="/docs/hashing">Hashing <span class="nav-badge-new">v2</span></a>
+
+            <h4 class="docs-nav-title">Utilities</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'str' ? 'active' : ''; ?>"
+                href="/docs/str">String Helper <span class="nav-badge-new">v2</span></a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'collections' ? 'active' : ''; ?>"
+                href="/docs/collections">Collections <span class="nav-badge-new">v2</span></a>
+
+            <h4 class="docs-nav-title">Digging Deeper</h4>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'errors' ? 'active' : ''; ?>"
+                href="/docs/errors">Error Handling</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'env' ? 'active' : ''; ?>"
+                href="/docs/env">Environment Configuration</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'artisan' ? 'active' : ''; ?>"
+                href="/docs/artisan">Backfire Console</a>
+            <a class="docs-nav-link <?php echo ($activeLine ?? '') === 'cli' ? 'active' : ''; ?>"
+                href="/docs/cli">Custom CLI Commands</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-8 docs-content ps-md-5">
+        <?php View::yield('docs-content'); ?>
+    </div>
+
+    <!-- Optional wide screen TOC skeleton -->
+    <div class="col-lg-2 d-none d-lg-block">
+        <!-- Future TOC placeholder -->
+    </div>
+</div>
+
+<?php View::endsection(); ?>
+```
+

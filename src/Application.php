@@ -7,6 +7,7 @@ use LunoxHoshizaki\Http\Request;
 use LunoxHoshizaki\Http\Response;
 use LunoxHoshizaki\Routing\Router;
 use Exception;
+use Throwable;
 
 class Application
 {
@@ -117,7 +118,7 @@ class Application
             $request = Request::capture();
             $response = $this->dispatchToRouter($request);
             $response->send();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->renderException($e);
         }
     }
@@ -125,30 +126,43 @@ class Application
     /**
      * Render the exception into an HTTP response.
      */
-    protected function renderException(Exception $e): void
+    protected function renderException(Throwable $e): void
     {
         $statusCode = 500;
         $message = $e->getMessage();
 
-        // Specific handling for routing errors can be added here
+        // Specific HTTP status code detection
         if (str_contains($message, 'Not Found')) {
             $statusCode = 404;
         }
 
-        // ISO 27001: Prevent detailed error stack traces in production
-        $isProduction = ($_ENV['APP_ENV'] ?? 'local') === 'production';
-        $exceptionToRender = $isProduction ? null : $e;
+        // Debug mode: active when APP_ENV=local OR APP_DEBUG=true
+        // Production mode: only when APP_ENV=production AND APP_DEBUG is not explicitly true
+        $appEnv   = $_ENV['APP_ENV']   ?? 'local';
+        $appDebug = $_ENV['APP_DEBUG'] ?? 'false';
+        $isDebug  = ($appEnv !== 'production') || ($appDebug === 'true');
 
         try {
-            $content = \LunoxHoshizaki\View\View::make('basic.errors.error', [
-                'code' => $statusCode,
-                'message' => 'Internal Server Error',
-                'exception' => $exceptionToRender
-            ]);
+            if ($isDebug) {
+                // Local/debug view — shows full exception, code snippet, stack trace
+                $content = \LunoxHoshizaki\View\View::make('errors.debug', [
+                    'exception' => $e,
+                    'code'      => $statusCode,
+                ]);
+            } else {
+                // Production view — safe, no internal details exposed
+                $content = \LunoxHoshizaki\View\View::make('errors.error', [
+                    'code'    => $statusCode,
+                    'message' => 'Internal Server Error',
+                ]);
+            }
             $response = new Response($content, $statusCode);
-        } catch (Exception $viewException) {
-            // Fallback if view fails
-            $response = new Response("Error {$statusCode}: " . ($isProduction ? "Server Error" : $message), $statusCode);
+        } catch (Throwable $viewException) {
+            // Last-resort plaintext fallback
+            $fallback = $isDebug
+                ? "Error {$statusCode}: {$message}"
+                : "Error {$statusCode}: An unexpected error occurred.";
+            $response = new Response($fallback, $statusCode);
         }
 
         $response->send();
@@ -176,11 +190,11 @@ class Application
     protected function renderMaintenanceMode(): void
     {
         try {
-            $content = \LunoxHoshizaki\View\View::make('basic.errors.503');
+            $content = \LunoxHoshizaki\View\View::make('errors.503');
             $response = new Response($content, 503);
             $response->send();
             return;
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             // Fallback plain 503
             http_response_code(503);
             echo "<h1>503 Service Unavailable</h1><p>The application is currently down for maintenance. Please check back later.</p>";

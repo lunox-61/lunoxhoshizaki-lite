@@ -30,4 +30,11 @@ class HomeController
             'message' => "Hello, {$name}! Your form was successfully submitted. CSRF validation passed."
         ]);
     }
+
+    public function errorSide(Request $request)
+    {
+        return View::mae('basic.error-side', [
+            'title' => 'Error Side'
+        ]);
+    }
 }

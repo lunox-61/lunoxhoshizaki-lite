@@ -6,6 +6,7 @@ use LunoxHoshizaki\Http\Request;
 use LunoxHoshizaki\Http\Response;
 use Closure;
 use Exception;
+use Throwable;
 
 class Router
 {
@@ -271,9 +272,9 @@ class Router
 
         // Custom 404 error page fallback
         try {
-            $content = \LunoxHoshizaki\View\View::make('basic.errors.error', ['code' => 404]);
+            $content = \LunoxHoshizaki\View\View::make('errors.error', ['code' => 404]);
             return new Response($content, 404);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return new Response('404 Not Found', 404);
         }
     }

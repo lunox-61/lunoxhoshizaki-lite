@@ -55,9 +55,6 @@
         <h2 class="fw-bold mb-3">Service Unavailable</h2>
         <p class="text-muted mb-4">The application is currently down for scheduled maintenance or upgrades. We'll be back online shortly. Thank you for your patience.</p>
         
-        <button onclick="window.location.reload();" class="btn btn-primary btn-lg mt-3 d-inline-flex align-items-center gap-2">
-            <span class="material-symbols-outlined">refresh</span> Retrieve Status
-        </button>
     </div>
 </body>
 </html>
