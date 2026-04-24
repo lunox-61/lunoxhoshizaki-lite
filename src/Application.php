@@ -136,11 +136,10 @@ class Application
             $statusCode = 404;
         }
 
-        // Debug mode: active when APP_ENV=local OR APP_DEBUG=true
-        // Production mode: only when APP_ENV=production AND APP_DEBUG is not explicitly true
-        $appEnv   = $_ENV['APP_ENV']   ?? 'local';
+        // Debug mode is controlled strictly by APP_DEBUG=true
+        // APP_ENV does NOT automatically enable debug output
         $appDebug = $_ENV['APP_DEBUG'] ?? 'false';
-        $isDebug  = ($appEnv !== 'production') || ($appDebug === 'true');
+        $isDebug  = ($appDebug === 'true');
 
         try {
             if ($isDebug) {

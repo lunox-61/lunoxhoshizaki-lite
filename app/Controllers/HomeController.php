@@ -33,7 +33,7 @@ class HomeController
 
     public function errorSide(Request $request)
     {
-        return View::mae('basic.error-side', [
+        return View::make('basic.error-side', [
             'title' => 'Error Side'
         ]);
     }

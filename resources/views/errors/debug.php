@@ -54,30 +54,31 @@ if (isset($exception) && file_exists($exFile)) {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: #0f1117;
+            background: #f4f6f9;
             font-family: 'Inter', system-ui, sans-serif;
-            color: #e2e8f0;
+            color: #1e293b;
             min-height: 100vh;
         }
 
         /* ── Top info bar ── */
         .info-bar {
-            background: #1a1d27;
-            border-bottom: 1px solid #2d3148;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
             padding: 10px 40px;
             display: flex;
             align-items: center;
             gap: 20px;
             flex-wrap: wrap;
             font-size: 0.8rem;
-            color: #94a3b8;
+            color: #64748b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         .info-bar .pill {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #252839;
-            border: 1px solid #2d3148;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 20px;
             padding: 4px 12px;
             font-size: 0.78rem;
@@ -88,7 +89,7 @@ if (isset($exception) && file_exists($exFile)) {
             height: 7px;
             border-radius: 50%;
         }
-        .pill .label { color: #64748b; margin-right: 2px; }
+        .pill .label { color: #94a3b8; margin-right: 2px; }
 
         /* ── Main layout ── */
         .debug-wrap {
@@ -108,12 +109,11 @@ if (isset($exception) && file_exists($exFile)) {
             font-weight: 700;
             letter-spacing: 0.3px;
             margin-bottom: 16px;
-            color: #fff;
         }
         .ex-message {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #f87171;
+            color: #dc2626;
             line-height: 1.4;
             margin-bottom: 12px;
             word-break: break-word;
@@ -122,15 +122,15 @@ if (isset($exception) && file_exists($exFile)) {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #94a3b8;
+            color: #64748b;
             font-size: 0.875rem;
         }
-        .ex-location strong { color: #e2e8f0; }
+        .ex-location strong { color: #334155; }
 
         /* ── Divider ── */
         .section-divider {
             border: none;
-            border-top: 1px solid #2d3148;
+            border-top: 1px solid #e2e8f0;
             margin: 28px 0;
         }
 
@@ -143,7 +143,7 @@ if (isset($exception) && file_exists($exFile)) {
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #64748b;
+            color: #94a3b8;
             margin-bottom: 14px;
         }
         .section-title .material-symbols-outlined { font-size: 1rem; }
@@ -152,20 +152,21 @@ if (isset($exception) && file_exists($exFile)) {
         .snippet-wrap {
             border-radius: 10px;
             overflow: hidden;
-            border: 1px solid #2d3148;
+            border: 1px solid #e2e8f0;
             margin-bottom: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .snippet-header {
-            background: #1a1d27;
+            background: #f8fafc;
             padding: 10px 18px;
             font-size: 0.78rem;
-            color: #94a3b8;
-            border-bottom: 1px solid #2d3148;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
         }
         .snippet-pre {
-            background: #13151f;
+            background: #282c34;
             overflow-x: auto;
             margin: 0;
             padding: 0;
@@ -181,37 +182,39 @@ if (isset($exception) && file_exists($exFile)) {
             padding: 0 18px;
         }
         .code-line.active-line {
-            background: rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, 0.2);
             border-left: 3px solid #ef4444;
         }
         .code-line .ln {
             min-width: 40px;
             text-align: right;
             margin-right: 20px;
-            color: #3d4466;
+            color: #4b5563;
             user-select: none;
             flex-shrink: 0;
         }
-        .code-line.active-line .ln { color: #f87171; }
+        .code-line.active-line .ln { color: #fca5a5; }
         .code-line .lc { color: #abb2bf; flex: 1; white-space: pre; }
 
         /* ── Stack trace ── */
         .trace-wrap {
-            border: 1px solid #2d3148;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            background: #ffffff;
         }
         .trace-item {
             padding: 14px 18px;
-            border-bottom: 1px solid #1e2133;
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             gap: 14px;
             align-items: flex-start;
         }
         .trace-item:last-child { border-bottom: none; }
         .trace-num {
-            background: #252839;
-            color: #64748b;
+            background: #f1f5f9;
+            color: #94a3b8;
             font-size: 0.7rem;
             font-weight: 700;
             min-width: 26px;
@@ -225,19 +228,19 @@ if (isset($exception) && file_exists($exFile)) {
         }
         .trace-file {
             font-size: 0.825rem;
-            color: #7dd3fc;
+            color: #2563eb;
             margin-bottom: 3px;
         }
-        .trace-file span { color: #f59e0b; }
+        .trace-file span { color: #d97706; }
         .trace-func {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.8rem;
-            color: #94a3b8;
+            color: #64748b;
         }
         .trace-list-inner {
             max-height: 420px;
             overflow-y: auto;
-            background: #13151f;
+            background: #ffffff;
         }
     </style>
 </head>

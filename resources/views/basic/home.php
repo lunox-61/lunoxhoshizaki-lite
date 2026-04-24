@@ -10,12 +10,12 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #0a0a0a;
+            background-color: #f4f6f9;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-            color: #ffffff;
+            color: #1a1a2e;
         }
 
         .container {
@@ -29,18 +29,19 @@
         .icon-circle {
             width: 100px;
             height: 100px;
-            background-color: #ffffff;
+            background-color: #1a1a2e;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
         }
 
         .icon-circle svg {
             width: 50px;
             height: 50px;
-            color: #0a0a0a;
+            color: #ffffff;
         }
 
         h1 {
