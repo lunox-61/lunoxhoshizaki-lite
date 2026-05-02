@@ -10,6 +10,15 @@ class Request
     public readonly array $cookies;
     public readonly array $files;
 
+    /**
+     * Trusted proxy IP addresses.
+     * Only trust X-Forwarded-For from these IPs.
+     * Set via Request::setTrustedProxies().
+     *
+     * Security Fix: Prevents IP spoofing (CWE-348).
+     */
+    protected static array $trustedProxies = [];
+
     public function __construct(array $query = [], array $request = [], array $server = [], array $cookies = [], array $files = [])
     {
         $this->query = $query;
@@ -44,8 +53,31 @@ class Request
 
     /**
      * Get the request method.
+     * Supports method spoofing via _method field for HTML forms.
+     *
+     * HTML forms only support GET and POST. To use PUT, PATCH, DELETE
+     * from forms, include a hidden _method field:
+     *   <input type="hidden" name="_method" value="PUT">
      */
     public function method(): string
+    {
+        $method = strtoupper($this->server['REQUEST_METHOD'] ?? 'GET');
+
+        // Method spoofing: only allow from POST requests for security
+        if ($method === 'POST') {
+            $spoofed = strtoupper($this->request['_method'] ?? $this->query['_method'] ?? '');
+            if (in_array($spoofed, ['PUT', 'PATCH', 'DELETE'], true)) {
+                return $spoofed;
+            }
+        }
+
+        return $method;
+    }
+
+    /**
+     * Get the real HTTP method (without spoofing).
+     */
+    public function realMethod(): string
     {
         return strtoupper($this->server['REQUEST_METHOD'] ?? 'GET');
     }
@@ -79,11 +111,22 @@ class Request
 
     /**
      * Get input as a sanitized string.
+     *
+     * @param string $key     Input field name
+     * @param string $default Default value
+     * @param bool   $raw     If true, return trimmed string without HTML escaping.
+     *                        Use raw=true when you will escape in the view layer.
      */
-    public function string(string $key, string $default = ''): string
+    public function string(string $key, string $default = '', bool $raw = false): string
     {
         $value = $this->input($key, $default);
-        return htmlspecialchars(trim((string) $value), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $trimmed = trim((string) $value);
+
+        if ($raw) {
+            return $trimmed;
+        }
+
+        return htmlspecialchars($trimmed, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     /**
@@ -293,13 +336,51 @@ class Request
 
     /**
      * Get the client IP address.
+     *
+     * Security Fix: Only trust proxy headers (X-Forwarded-For, X-Client-IP)
+     * when the direct connection comes from a trusted proxy.
+     * Prevents CWE-348 (IP Spoofing) attacks.
+     *
+     * Satisfies: OWASP A01:2021, NIST AC-3
      */
     public function ip(): string
     {
-        return $this->server['HTTP_X_FORWARDED_FOR'] 
-            ?? $this->server['HTTP_CLIENT_IP'] 
-            ?? $this->server['REMOTE_ADDR'] 
-            ?? '0.0.0.0';
+        $remoteAddr = $this->server['REMOTE_ADDR'] ?? '0.0.0.0';
+
+        // Only trust forwarded headers if the direct connection is from a trusted proxy
+        if (!empty(static::$trustedProxies) && in_array($remoteAddr, static::$trustedProxies, true)) {
+            // Parse X-Forwarded-For: the leftmost entry is the original client
+            if (!empty($this->server['HTTP_X_FORWARDED_FOR'])) {
+                $ips = array_map('trim', explode(',', $this->server['HTTP_X_FORWARDED_FOR']));
+                $clientIp = $ips[0] ?? $remoteAddr;
+                // Validate that it looks like a real IP
+                if (filter_var($clientIp, FILTER_VALIDATE_IP)) {
+                    return $clientIp;
+                }
+            }
+
+            if (!empty($this->server['HTTP_CLIENT_IP'])) {
+                $clientIp = trim($this->server['HTTP_CLIENT_IP']);
+                if (filter_var($clientIp, FILTER_VALIDATE_IP)) {
+                    return $clientIp;
+                }
+            }
+        }
+
+        return $remoteAddr;
+    }
+
+    /**
+     * Set trusted proxy IP addresses.
+     * X-Forwarded-For and X-Client-IP headers will only be respected
+     * when the REMOTE_ADDR matches one of these addresses.
+     *
+     * Usage in bootstrap:
+     *   Request::setTrustedProxies(['127.0.0.1', '10.0.0.0/8']);
+     */
+    public static function setTrustedProxies(array $proxies): void
+    {
+        static::$trustedProxies = $proxies;
     }
 
     /**
@@ -316,11 +397,15 @@ class Request
 
     /**
      * Validate the request data.
+     *
+     * Returns validated data on success.
+     * On failure, flashes errors and old input to session
+     * and redirects back via Redirect object (testable, no exit/die).
      */
-    public function validate(array $rules): array
+    public function validate(array $rules, array $messages = []): array
     {
         $data = $this->all();
-        $validator = \LunoxHoshizaki\Validation\Validator::make($data, $rules);
+        $validator = \LunoxHoshizaki\Validation\Validator::make($data, $rules, $messages);
 
         if ($validator->fails()) {
             if (session_status() === PHP_SESSION_NONE) {
@@ -331,8 +416,8 @@ class Request
             $_SESSION['_flash']['old'] = $data;
 
             $referer = $this->server['HTTP_REFERER'] ?? '/';
-            header("Location: " . $referer);
-            exit;
+            $redirect = Redirect::to($referer);
+            $redirect->send();
         }
 
         return $data;

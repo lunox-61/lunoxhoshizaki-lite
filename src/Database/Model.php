@@ -56,19 +56,116 @@ class Model
     protected ?string $groupBy = null;
     protected ?string $havingRaw = null;
 
+    /**
+     * Common irregular plurals for English nouns.
+     * Used by the auto-table-name guesser.
+     */
+    protected static array $irregularPlurals = [
+        'child' => 'children',
+        'person' => 'people',
+        'man' => 'men',
+        'woman' => 'women',
+        'mouse' => 'mice',
+        'goose' => 'geese',
+        'tooth' => 'teeth',
+        'foot' => 'feet',
+        'ox' => 'oxen',
+        'datum' => 'data',
+        'criterion' => 'criteria',
+        'analysis' => 'analyses',
+        'basis' => 'bases',
+        'crisis' => 'crises',
+        'diagnosis' => 'diagnoses',
+        'thesis' => 'theses',
+        'phenomenon' => 'phenomena',
+        'medium' => 'media',
+        'curriculum' => 'curricula',
+        'formula' => 'formulae',
+        'index' => 'indices',
+        'matrix' => 'matrices',
+        'vertex' => 'vertices',
+        'appendix' => 'appendices',
+        'quiz' => 'quizzes',
+    ];
+
     public function __construct(array $attributes = [])
     {
         $this->fill($attributes);
 
         if (!isset($this->table)) {
             $classParts = explode('\\', get_class($this));
-            $this->table = strtolower(end($classParts)) . 's'; // simple pluralization
+            $className = strtolower(end($classParts));
+            $this->table = static::pluralize($className);
         }
 
         // Handle SoftDeletes trait initialization
         if (in_array(\LunoxHoshizaki\Database\Traits\SoftDeletes::class, class_uses_recursive(static::class))) {
             $this->where($this->table . '.deleted_at', 'IS', null);
         }
+    }
+
+    /**
+     * Simple English pluralization.
+     *
+     * Handles irregular nouns, common suffixes (-y → -ies, -s/-sh/-ch/-x/-z → -es),
+     * and words that are already plural or uncountable.
+     */
+    protected static function pluralize(string $word): string
+    {
+        // Check irregular plurals first
+        if (isset(static::$irregularPlurals[$word])) {
+            return static::$irregularPlurals[$word];
+        }
+
+        // Uncountable words (same singular and plural)
+        $uncountable = ['equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep', 'deer', 'data', 'feedback', 'staff', 'media'];
+        if (in_array($word, $uncountable, true)) {
+            return $word;
+        }
+
+        // Already ends in 's' (likely already plural)
+        // But handle words like 'status' → 'statuses', 'bus' → 'buses'
+        $len = strlen($word);
+
+        // -sis → -ses (analysis → analyses, basis → bases)
+        if (str_ends_with($word, 'sis')) {
+            return substr($word, 0, -3) . 'ses';
+        }
+
+        // -y → -ies (company → companies, category → categories)
+        // But only when preceded by a consonant (day → days, key → keys)
+        if (str_ends_with($word, 'y') && $len > 1) {
+            $charBefore = $word[$len - 2];
+            if (!in_array($charBefore, ['a', 'e', 'i', 'o', 'u'], true)) {
+                return substr($word, 0, -1) . 'ies';
+            }
+        }
+
+        // -fe → -ves (wife → wives, knife → knives)
+        if (str_ends_with($word, 'fe')) {
+            return substr($word, 0, -2) . 'ves';
+        }
+
+        // -f → -ves (leaf → leaves, shelf → shelves) — but not all (roof → roofs)
+        $fToVes = ['leaf', 'shelf', 'wolf', 'half', 'calf', 'loaf', 'thief', 'elf', 'self'];
+        if (str_ends_with($word, 'f') && in_array($word, $fToVes, true)) {
+            return substr($word, 0, -1) . 'ves';
+        }
+
+        // -s, -ss, -sh, -ch, -x, -z → -es (status → statuses, box → boxes)
+        if (preg_match('/(s|ss|sh|ch|x|z)$/', $word)) {
+            return $word . 'es';
+        }
+
+        // -o → -es for common words (hero → heroes, tomato → tomatoes)
+        // But not all (photo → photos, piano → pianos)
+        $oToEs = ['hero', 'potato', 'tomato', 'echo', 'torpedo', 'veto'];
+        if (str_ends_with($word, 'o') && in_array($word, $oToEs, true)) {
+            return $word . 'es';
+        }
+
+        // Default: add 's'
+        return $word . 's';
     }
 
     /**
@@ -279,6 +376,32 @@ class Model
     }
 
     /**
+     * Add a "where in subquery" clause to the query.
+     *
+     * Usage:
+     *   $model->whereInSub('user_id', 'SELECT id FROM users WHERE active = ?', [1]);
+     */
+    public function whereInSub(string $column, string $subquery, array $bindings = []): self
+    {
+        $this->wheres[] = ['type' => 'raw', 'sql' => "{$column} IN ({$subquery})", 'boolean' => 'AND'];
+        $this->bindings = array_merge($this->bindings, $bindings);
+        return $this;
+    }
+
+    /**
+     * Add a "where exists" subquery clause.
+     *
+     * Usage:
+     *   $model->whereExists('SELECT 1 FROM orders WHERE orders.user_id = users.id');
+     */
+    public function whereExists(string $subquery, array $bindings = []): self
+    {
+        $this->wheres[] = ['type' => 'raw', 'sql' => "EXISTS ({$subquery})", 'boolean' => 'AND'];
+        $this->bindings = array_merge($this->bindings, $bindings);
+        return $this;
+    }
+
+    /**
      * Add a join clause to the query.
      */
     public function join(string $table, string $first, string $operator, string $second, string $type = 'INNER'): self
@@ -293,6 +416,23 @@ class Model
     public function leftJoin(string $table, string $first, string $operator, string $second): self
     {
         return $this->join($table, $first, $operator, $second, 'LEFT');
+    }
+
+    /**
+     * Add a right join clause to the query.
+     */
+    public function rightJoin(string $table, string $first, string $operator, string $second): self
+    {
+        return $this->join($table, $first, $operator, $second, 'RIGHT');
+    }
+
+    /**
+     * Add a cross join clause to the query.
+     */
+    public function crossJoin(string $table): self
+    {
+        $this->joins[] = "CROSS JOIN $table";
+        return $this;
     }
 
     /**
@@ -428,16 +568,37 @@ class Model
 
     /**
      * Get the count of records.
+     *
+     * Properly handles GROUP BY queries by wrapping them in a subquery
+     * to count distinct groups instead of returning the first group's count.
      */
     public function count(): int
     {
-        $sql = "SELECT COUNT(*) as aggregate FROM {$this->table}";
+        if ($this->groupBy !== null) {
+            // Wrap the grouped query in a subquery for accurate counting
+            $innerSql = "SELECT 1 FROM {$this->table}";
 
-        if (!empty($this->joins)) {
-            $sql .= " " . implode(" ", $this->joins);
+            if (!empty($this->joins)) {
+                $innerSql .= " " . implode(" ", $this->joins);
+            }
+
+            $innerSql .= $this->buildWhereClause();
+            $innerSql .= " GROUP BY " . $this->groupBy;
+
+            if ($this->havingRaw !== null) {
+                $innerSql .= " HAVING " . $this->havingRaw;
+            }
+
+            $sql = "SELECT COUNT(*) as aggregate FROM ({$innerSql}) as grouped_count";
+        } else {
+            $sql = "SELECT COUNT(*) as aggregate FROM {$this->table}";
+
+            if (!empty($this->joins)) {
+                $sql .= " " . implode(" ", $this->joins);
+            }
+
+            $sql .= $this->buildWhereClause();
         }
-
-        $sql .= $this->buildWhereClause();
 
         $stmt = static::getConnection()->prepare($sql);
         $stmt->execute($this->bindings);
@@ -463,15 +624,8 @@ class Model
         }
 
         // Count total before applying limit/offset
-        $countSql = "SELECT COUNT(*) as aggregate FROM {$this->table}";
-        if (!empty($this->joins)) {
-            $countSql .= " " . implode(" ", $this->joins);
-        }
-        $countSql .= $this->buildWhereClause();
-
-        $stmt = static::getConnection()->prepare($countSql);
-        $stmt->execute($this->bindings);
-        $total = (int) $stmt->fetchColumn();
+        // Clone bindings to use for count query (count() uses the same bindings)
+        $total = $this->count();
 
         // Apply limit and offset
         $this->limit($perPage);
@@ -550,6 +704,12 @@ class Model
 
     /**
      * Save the model to the database.
+     *
+     * Security Fix: For UPDATE operations, only persist attributes that are
+     * in the $fillable array (plus the primary key). This prevents mass
+     * assignment attacks where an attacker injects fields like 'is_admin'.
+     *
+     * Satisfies: OWASP A01:2021, CWE-915 – Improperly Controlled Modification
      */
     public function save(): bool
     {
@@ -558,11 +718,10 @@ class Model
             $this->updateTimestamps();
         }
 
-        $columns = array_keys($this->attributes);
-        $columns = array_filter($columns, fn($col) => $col !== $this->primaryKey);
-
         if (empty($this->attributes[$this->primaryKey])) {
-            // INSERT
+            // INSERT — only fillable + timestamp columns
+            $columns = $this->getSaveableColumns();
+
             $placeholders = array_fill(0, count($columns), '?');
             $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
             
@@ -579,7 +738,9 @@ class Model
             }
             return $result;
         } else {
-            // UPDATE
+            // UPDATE — only fillable + timestamp columns
+            $columns = $this->getSaveableColumns();
+
             $sets = array_map(fn($col) => "$col = ?", $columns);
             $sql = "UPDATE {$this->table} SET " . implode(', ', $sets) . " WHERE {$this->primaryKey} = ?";
             
@@ -591,6 +752,33 @@ class Model
 
             return static::getConnection()->prepare($sql)->execute($bindings);
         }
+    }
+
+    /**
+     * Determine which columns are safe to persist.
+     *
+     * Returns columns from $this->attributes that are either:
+     * - In the $fillable array, OR
+     * - Recognized timestamp columns (created_at, updated_at, deleted_at)
+     *
+     * The primary key is never included in the save list.
+     */
+    protected function getSaveableColumns(): array
+    {
+        $timestampColumns = ['created_at', 'updated_at', 'deleted_at'];
+        $saveable = [];
+
+        foreach (array_keys($this->attributes) as $col) {
+            if ($col === $this->primaryKey) {
+                continue;
+            }
+
+            if (in_array($col, $this->fillable, true) || in_array($col, $timestampColumns, true)) {
+                $saveable[] = $col;
+            }
+        }
+
+        return $saveable;
     }
 
     /**

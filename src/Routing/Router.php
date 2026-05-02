@@ -32,6 +32,12 @@ class Router
     protected static array $groupStack = [];
 
     /**
+     * Route parameter constraints (per-route regex patterns).
+     * Format: ['method:uri' => ['param' => 'regex']]
+     */
+    protected static array $routeConstraints = [];
+
+    /**
      * Register a GET route.
      */
     public static function get(string $uri, array|Closure $action): static
@@ -134,7 +140,36 @@ class Router
     }
 
     /**
+     * Add a regex constraint for a route parameter.
+     *
+     * Usage:
+     *   Router::get('/users/{id}', [...])->where('id', '[0-9]+');
+     *   Router::get('/posts/{slug}', [...])->where('slug', '[a-z0-9-]+');
+     */
+    public function where(string|array $param, ?string $regex = null): static
+    {
+        if (empty(static::$lastRouteParams)) {
+            return $this;
+        }
+
+        $key = static::$lastRouteParams['method'] . ':' . static::$lastRouteParams['uri'];
+
+        if (is_array($param)) {
+            foreach ($param as $name => $pattern) {
+                static::$routeConstraints[$key][$name] = $pattern;
+            }
+        } else {
+            static::$routeConstraints[$key][$param] = $regex;
+        }
+
+        return $this;
+    }
+
+    /**
      * Define a group of routes that share attributes (prefix, middleware).
+     *
+     * Exception-safe: the group stack is always popped, even if an
+     * exception occurs inside the callback.
      *
      * Usage:
      *   Router::prefix('/api')->middleware([...])->group(function() { ... });
@@ -143,10 +178,13 @@ class Router
      */
     public function group(Closure $callback): void
     {
-        $callback();
-
-        // Pop the current group off the stack after executing
-        array_pop(static::$groupStack);
+        try {
+            $callback();
+        } finally {
+            // Pop the current group off the stack after executing
+            // Using finally ensures the stack is popped even on exception
+            array_pop(static::$groupStack);
+        }
     }
 
     /**
@@ -242,6 +280,14 @@ class Router
 
     /**
      * Dispatch the request.
+     *
+     * Supports broadened route parameter patterns that accept:
+     * - Standard alphanumeric: letters, numbers, underscores, hyphens
+     * - UUIDs: 550e8400-e29b-41d4-a716-446655440000
+     * - Dots and tildes: file.name, ~user
+     * - URL-encoded characters: %20, %2F
+     *
+     * Per-route constraints via ->where() are applied when defined.
      */
     public static function dispatch(Request $request): Response
     {
@@ -257,7 +303,17 @@ class Router
 
         // Handle dynamic parameters
         foreach ($routes as $routeUri => $route) {
-            $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-zA-Z0-9_-]+)', $routeUri);
+            $constraintKey = $method . ':' . $routeUri;
+            $constraints = static::$routeConstraints[$constraintKey] ?? [];
+
+            // Build the regex, applying per-parameter constraints or using broad default
+            $pattern = preg_replace_callback('/\{([a-zA-Z0-9_]+)\}/', function ($m) use ($constraints) {
+                $paramName = $m[1];
+                // Use per-route constraint if defined, otherwise broad default
+                $regex = $constraints[$paramName] ?? '[a-zA-Z0-9_\-\.~%]+';
+                return '(?P<' . $paramName . '>' . $regex . ')';
+            }, $routeUri);
+
             $pattern = str_replace('/', '\/', $pattern);
 
             if (preg_match('/^' . $pattern . '$/', $uri, $matches)) {
@@ -281,6 +337,9 @@ class Router
 
     /**
      * Run the route action through constraints and middlewares.
+     *
+     * Controllers and middleware are resolved through the IoC Container
+     * when available, enabling constructor dependency injection.
      */
     protected static function runRoute(Request $request, array $route, array $params = []): Response
     {
@@ -291,7 +350,8 @@ class Router
             if ($action instanceof Closure) {
                 $response = call_user_func_array($action, array_merge([$request], $params));
             } elseif (is_array($action) && count($action) === 2) {
-                $controller = new $action[0]();
+                // Resolve controller via Container (enables DI) with fallback
+                $controller = static::resolveClass($action[0]);
                 $method = $action[1];
                 $response = call_user_func_array([$controller, $method], array_merge([$request], $params));
             } else {
@@ -318,7 +378,8 @@ class Router
             array_reverse($middlewares),
             function ($next, $middleware) {
                 return function ($request) use ($next, $middleware) {
-                    $instance = new $middleware();
+                    // Resolve middleware via Container (enables DI) with fallback
+                    $instance = static::resolveClass($middleware);
                     return $instance->handle($request, $next);
                 };
             },
@@ -326,5 +387,23 @@ class Router
         );
 
         return $pipeline($request);
+    }
+
+    /**
+     * Resolve a class via the IoC Container, with fallback to plain instantiation.
+     *
+     * This allows controllers and middleware to receive constructor-injected
+     * dependencies when the Container is configured, while maintaining
+     * backward compatibility with existing code that uses no DI.
+     */
+    protected static function resolveClass(string $className): object
+    {
+        try {
+            $container = \LunoxHoshizaki\Container\Container::getInstance();
+            return $container->make($className);
+        } catch (\Throwable $e) {
+            // Fallback: plain instantiation (backward compatible)
+            return new $className();
+        }
     }
 }
