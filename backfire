@@ -31,6 +31,7 @@ if (empty($args)) {
     echo "  make:model         Create a new model class\n";
     echo "  make:middleware    Create a new middleware class\n";
     echo "  make:request       Create a new form request class\n";
+    echo "  make:api-controller Create a new API controller class\n";
     echo "  make:migration     Create a new PHP migration file\n";
     echo "  migrate            Run all pending database migrations\n";
     echo "  make:seeder        Create a new database seeder class\n";
@@ -39,6 +40,7 @@ if (empty($args)) {
     echo "  make:event         Create a new event class\n";
     echo "  make:listener      Create a new event listener class\n";
     echo "  key:generate       Set the application key\n";
+    echo "  jwt:secret         Generate and set the APP_JWT_SECRET key\n";
     echo "  cache:clear        Flush the application cache\n";
     echo "  down               Put the application into maintenance mode\n";
     echo "  up                 Bring the application out of maintenance mode\n";
@@ -82,6 +84,86 @@ if (is_dir($commandsDir)) {
 }
 
 switch ($command) {
+    case 'make:api-controller':
+        if (empty($args)) {
+            echo "❌ Error: Controller name is required. (e.g. php backfire make:api-controller UserController)\n";
+            exit(1);
+        }
+        $name = $args[0];
+        $path = __DIR__ . "/app/Controllers/{$name}.php";
+        if (file_exists($path)) {
+            echo "❌ Error: Controller already exists.\n";
+            exit(1);
+        }
+        $template = <<<PHP
+<?php
+
+namespace App\Controllers;
+
+use LunoxHoshizaki\Api\ApiController;
+use LunoxHoshizaki\Http\Request;
+use LunoxHoshizaki\Http\Response;
+
+class {$name} extends ApiController
+{
+    /**
+     * GET /api/resource
+     * Return a list of resources.
+     */
+    public function index(Request \$request): Response
+    {
+        return \$this->success([], 'Resource list fetched successfully.');
+    }
+
+    /**
+     * POST /api/resource
+     * Create a new resource.
+     */
+    public function store(Request \$request): Response
+    {
+        \$validated = \$this->validateApi(\$request, [
+            // 'name' => 'required|string|max:255',
+        ]);
+
+        if (\$validated instanceof Response) {
+            return \$validated; // 422 validation error
+        }
+
+        return \$this->created(\$validated, 'Resource created successfully.');
+    }
+
+    /**
+     * GET /api/resource/{id}
+     * Return a single resource.
+     */
+    public function show(Request \$request, string \$id): Response
+    {
+        return \$this->success(['id' => \$id], 'Resource fetched.');
+    }
+
+    /**
+     * PUT /api/resource/{id}
+     * Update a resource.
+     */
+    public function update(Request \$request, string \$id): Response
+    {
+        return \$this->success(['id' => \$id], 'Resource updated.');
+    }
+
+    /**
+     * DELETE /api/resource/{id}
+     * Delete a resource.
+     */
+    public function destroy(Request \$request, string \$id): Response
+    {
+        return \$this->noContent();
+    }
+}
+PHP;
+        file_put_contents($path, $template);
+        echo "✅ API Controller [app/Controllers/{$name}.php] created successfully.\n";
+        break;
+
     case 'make:controller':
         if (empty($args)) {
             echo "❌ Error: Controller name is required. (e.g. php backfire make:controller UserController)\n";
@@ -470,6 +552,24 @@ PHP;
         $content = preg_replace('/^APP_KEY=.*$/m', 'APP_KEY=' . $key, $content);
         file_put_contents($envPath, $content);
         echo "✅ Application key set successfully.\n";
+        break;
+
+    case 'jwt:secret':
+        $envPath = __DIR__ . '/.env';
+        if (!file_exists($envPath)) {
+            echo "❌ Error: .env file not found.\n";
+            exit(1);
+        }
+        $secret  = 'base64:' . base64_encode(random_bytes(64));
+        $content = file_get_contents($envPath);
+        if (preg_match('/^APP_JWT_SECRET=.*$/m', $content)) {
+            $content = preg_replace('/^APP_JWT_SECRET=.*$/m', 'APP_JWT_SECRET=' . $secret, $content);
+        } else {
+            $content .= "\nAPP_JWT_SECRET={$secret}\n";
+        }
+        file_put_contents($envPath, $content);
+        echo "✅ JWT secret key generated and set in .env.\n";
+        echo "   Key: {$secret}\n";
         break;
 
     case 'cache:clear':

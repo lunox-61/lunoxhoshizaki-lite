@@ -1,5 +1,30 @@
 # Lunox Backfire v2 Update Notes
 
+## ⚡ v2.3.0 - API Support & JWT Foundation (2026-05-05)
+
+Update **v2.3.0** memfokuskan pada penyiapan fondasi API yang solid dan siap produksi, mencakup sistem respons standar, JWT, dan scaffolding tooling.
+
+### Komponen Baru:
+1. **`ApiResponse`** (`src/Http/ApiResponse.php`): Factory class untuk respons JSON standar dengan envelope `{success, message, data, meta}`. Tersedia method: `success()`, `error()`, `created()`, `paginated()`, `notFound()`, `unauthorized()`, `forbidden()`, `validationError()`, `tooManyRequests()`, `noContent()`, `serverError()`.
+2. **`ApiController`** (`src/Api/ApiController.php`): Base controller untuk API. Extend class ini di controller API untuk mendapat shortcut method `success()`, `error()`, `created()`, `paginated()`, `validateApi()`, dll.
+3. **`JwtGuard`** (`src/Security/JwtGuard.php`): Implementasi JWT HS256 bawaan — `generate()`, `verify()`, `getUserId()`, `decode()`. Konfigurasi via `APP_JWT_SECRET` dan `APP_JWT_TTL` di `.env`.
+4. **`JwtMiddleware`** (`src/Security/JwtMiddleware.php`): Middleware autentikasi JWT untuk route group. Payload token disuntikkan ke `$_SERVER['JWT_PAYLOAD']`.
+
+### Komponen yang Diperbarui:
+5. **`ApiAuthMiddleware`** (`src/Security/ApiAuthMiddleware.php`): Kini menggunakan `ApiResponse::unauthorized()` untuk respons error yang konsisten, mendukung multi-token via `APP_API_TOKENS` (comma-separated), dan backward-compatible dengan `APP_API_TOKEN` lama.
+6. **`helpers.php`** (`src/helpers.php`): Ditambahkan 6 helper global baru: `api_success()`, `api_error()`, `api_paginated()`, `jwt_generate()`, `jwt_verify()`, `bearer_token()`.
+7. **`routes/api.php`**: Template lengkap dengan 3 grup: Public (CORS only), Token Auth, dan JWT Auth. Endpoint baru: `GET /api/status`, `GET /api/ping`, `POST /api/connect`, `GET /api/me`.
+8. **`.env` & `.env.example`**: Ditambahkan blok konfigurasi `APP_API_TOKEN`, `APP_API_TOKENS`, `APP_JWT_SECRET`, `APP_JWT_TTL`.
+
+### Backfire CLI:
+9. **`php backfire jwt:secret`**: Generate dan simpan `APP_JWT_SECRET` ke `.env` secara otomatis.
+10. **`php backfire make:api-controller`**: Scaffold controller API baru yang extend `ApiController` dengan method CRUD siap pakai.
+
+### Autoload:
+11. Namespace `LunoxHoshizaki\Api\` ditambahkan di `composer.json` PSR-4 autoload.
+
+---
+
 ## 🚀 v2.2.0 - Minor Enhancements & Stability Update (2026-05-05)
 
 Update **v2.2.0** membawa serangkaian peningkatan kecil yang meningkatkan stabilitas, developer experience, dan konsistensi komponen inti framework.

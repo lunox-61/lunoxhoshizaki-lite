@@ -325,3 +325,102 @@ if (!function_exists('resolve')) {
         return \LunoxHoshizaki\Container\Container::getInstance()->make($abstract, $params);
     }
 }
+
+if (!function_exists('api_success')) {
+    /**
+     * Return a standardized API success JSON response.
+     *
+     * Usage:
+     *   return api_success($data);
+     *   return api_success($user->toArray(), 'User fetched.', 200);
+     *   return api_success($item, 'Created.', 201, ['server_time' => now()]);
+     */
+    function api_success(
+        mixed  $data       = null,
+        string $message    = 'Success.',
+        int    $statusCode = 200,
+        array  $meta       = []
+    ): \LunoxHoshizaki\Http\Response {
+        return \LunoxHoshizaki\Http\ApiResponse::success($data, $message, $statusCode, $meta);
+    }
+}
+
+if (!function_exists('api_error')) {
+    /**
+     * Return a standardized API error JSON response.
+     *
+     * Usage:
+     *   return api_error('Not found.', 404);
+     *   return api_error('Validation failed.', 422, $validator->errors());
+     */
+    function api_error(
+        string $message    = 'An error occurred.',
+        int    $statusCode = 400,
+        mixed  $errors     = null
+    ): \LunoxHoshizaki\Http\Response {
+        return \LunoxHoshizaki\Http\ApiResponse::error($message, $statusCode, $errors);
+    }
+}
+
+if (!function_exists('api_paginated')) {
+    /**
+     * Return a standardized paginated API JSON response.
+     *
+     * Usage:
+     *   return api_paginated($users, $total, $page, $perPage);
+     */
+    function api_paginated(
+        array  $items,
+        int    $total,
+        int    $page    = 1,
+        int    $perPage = 15,
+        string $message = 'Success.'
+    ): \LunoxHoshizaki\Http\Response {
+        return \LunoxHoshizaki\Http\ApiResponse::paginated($items, $total, $page, $perPage, $message);
+    }
+}
+
+if (!function_exists('jwt_generate')) {
+    /**
+     * Generate a signed JWT token for the given claims.
+     *
+     * Usage:
+     *   $token = jwt_generate(['user_id' => $user->id, 'role' => $user->role]);
+     *   $token = jwt_generate(['user_id' => 1], ttl: 86400); // 24 hours
+     */
+    function jwt_generate(array $claims = [], ?int $ttl = null): string
+    {
+        return \LunoxHoshizaki\Security\JwtGuard::generate($claims, $ttl);
+    }
+}
+
+if (!function_exists('jwt_verify')) {
+    /**
+     * Verify a JWT token and return its payload, or null if invalid/expired.
+     *
+     * Usage:
+     *   $payload = jwt_verify($token);
+     *   if (!$payload) { // handle unauthorized }
+     */
+    function jwt_verify(string $token): ?array
+    {
+        return \LunoxHoshizaki\Security\JwtGuard::verify($token);
+    }
+}
+
+if (!function_exists('bearer_token')) {
+    /**
+     * Get the Bearer token from the current Authorization header.
+     *
+     * Usage:
+     *   $token = bearer_token();
+     */
+    function bearer_token(): ?string
+    {
+        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if (preg_match('/Bearer\s(\S+)/', $header, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
+}

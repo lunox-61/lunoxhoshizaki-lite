@@ -34,6 +34,20 @@ Sangat direkomendasikan untuk mencatat apa saja yang berubah di file `CHANGELOG.
 **Contoh Format:**
 
 ```markdown
+## [2.3.0] - 2026-05-05
+### ⚡ API Support & JWT Foundation
+- **Baru** `ApiResponse` — factory class respons JSON standar (success, error, paginated, created, notFound, dll).
+- **Baru** `ApiController` — base controller API dengan shortcut method CRUD dan `validateApi()` non-redirect.
+- **Baru** `JwtGuard` — implementasi JWT HS256 bawaan (`generate`, `verify`, `getUserId`).
+- **Baru** `JwtMiddleware` — middleware autentikasi JWT untuk route group.
+- **Diperbarui** `ApiAuthMiddleware` — pakai `ApiResponse`, dukung `APP_API_TOKENS` (multi-token).
+- **Diperbarui** `helpers.php` — 6 helper baru: `api_success()`, `api_error()`, `api_paginated()`, `jwt_generate()`, `jwt_verify()`, `bearer_token()`.
+- **Diperbarui** `routes/api.php` — 3 grup endpoint (Public, Token Auth, JWT Auth).
+- **Diperbarui** `.env` — blok `APP_API_TOKEN`, `APP_API_TOKENS`, `APP_JWT_SECRET`, `APP_JWT_TTL`.
+- **CLI** `php backfire jwt:secret` — generate APP_JWT_SECRET ke .env.
+- **CLI** `php backfire make:api-controller` — scaffold ApiController dengan CRUD stub.
+- **Autoload** — namespace `LunoxHoshizaki\Api\` didaftarkan di `composer.json`.
+
 ## [2.2.0] - 2026-05-05
 ### 🚀 Enhanced
 - Sinkronisasi versi seluruh komponen (`composer.json`, `.env`, `.env.example`) ke `2.2.0`.
