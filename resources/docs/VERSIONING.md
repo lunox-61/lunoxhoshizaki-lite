@@ -34,6 +34,12 @@ Sangat direkomendasikan untuk mencatat apa saja yang berubah di file `CHANGELOG.
 **Contoh Format:**
 
 ```markdown
+## [2.2.0] - 2026-05-05
+### 🚀 Enhanced
+- Sinkronisasi versi seluruh komponen (`composer.json`, `.env`, `.env.example`) ke `2.2.0`.
+- Backfire CLI: versi pada banner `php backfire` dan perintah `monitor` kini selalu terbaca dari `APP_VERSION` di `.env` tanpa fallback hardcoded yang tidak sinkron.
+- Pembaruan dokumentasi internal: `V2_UPDATE_NOTES.md` dan `resources/docs/VERSIONING.md` diperbarui untuk mencerminkan rilis ini.
+
 ## [2.0.0] - 2026-04-09
 ### 🔴 Security (CRITICAL)
 - **[CWE-384]** Fixed session fixation vulnerability — `Auth::login()` and `logout()` now regenerate session ID via `session_regenerate_id(true)`.

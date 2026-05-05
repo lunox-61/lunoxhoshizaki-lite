@@ -1,7 +1,7 @@
 {
     "name": "lunoxhoshizaki/framework-lite",
     "description": "A lightweight but advanced PHP MVC Framework.",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "type": "project",
     "require": {
         "php": "^8.1",

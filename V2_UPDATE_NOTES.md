@@ -1,5 +1,16 @@
 # Lunox Backfire v2 Update Notes
 
+## 🚀 v2.2.0 - Minor Enhancements & Stability Update (2026-05-05)
+
+Update **v2.2.0** membawa serangkaian peningkatan kecil yang meningkatkan stabilitas, developer experience, dan konsistensi komponen inti framework.
+
+### Perubahan & Peningkatan:
+1. **Version Bump:** Seluruh titik registrasi versi (`composer.json`, `.env`, `.env.example`) diselaraskan ke `2.2.0` untuk konsistensi lintas komponen.
+2. **Backfire CLI:** Banner versi pada `php backfire` dan `php backfire monitor` kini membaca langsung dari `APP_VERSION` di `.env`, sehingga tidak ada hardcoded fallback yang ketinggalan.
+3. **Dokumentasi Internal:** Changelog di `resources/docs/VERSIONING.md` dan `V2_UPDATE_NOTES.md` diperbarui mencerminkan rilis ini.
+
+---
+
 ## 🛡️ v2.1.0 - Security Hardening & Compliance Update (2026-04-13)
 
 Update **v2.1.0** berfokus pada penutupan *security gaps* untuk mematuhi standar ISO 27001, OWASP Top 10 (2021), dan NIST SP 800-53, menjadikan framework ini sangat aman untuk level *enterprise*.
