@@ -1,8 +1,5 @@
 <?php
 
-use Exception;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use LunoxHoshizaki\Routing\Router;
 use LunoxHoshizaki\Security\CsrfMiddleware;
 use App\Controllers\HomeController;

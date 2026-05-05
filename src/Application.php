@@ -3,6 +3,7 @@
 namespace LunoxHoshizaki;
 
 use Dotenv\Dotenv;
+use LunoxHoshizaki\Container\Container;
 use LunoxHoshizaki\Http\Request;
 use LunoxHoshizaki\Http\Response;
 use LunoxHoshizaki\Routing\Router;
@@ -22,12 +23,20 @@ class Application
     protected static ?Application $instance = null;
 
     /**
+     * The IoC service container.
+     */
+    protected Container $container;
+
+    /**
      * Create a new application instance.
      */
     public function __construct(string $basePath)
     {
         $this->basePath = rtrim($basePath, '\/');
         static::$instance = $this;
+
+        $this->container = Container::getInstance();
+        $this->container->instance(Application::class, $this);
 
         $this->bootstrap();
     }
@@ -44,11 +53,20 @@ class Application
     }
 
     /**
+     * Get the IoC container.
+     */
+    public function getContainer(): Container
+    {
+        return $this->container;
+    }
+
+    /**
      * Bootstrap the application.
      */
     protected function bootstrap(): void
     {
         $this->loadEnvironment();
+        $this->configureTrustedProxies();
         $this->loadRoutes();
     }
 
@@ -60,6 +78,25 @@ class Application
         if (file_exists($this->basePath . '/.env')) {
             $dotenv = Dotenv::createImmutable($this->basePath);
             $dotenv->load();
+        }
+    }
+
+    /**
+     * Configure trusted proxies from environment.
+     *
+     * Set TRUSTED_PROXIES in .env as a comma-separated list of IP addresses.
+     * Example: TRUSTED_PROXIES=127.0.0.1,10.0.0.1,172.16.0.0/12
+     *
+     * This ensures X-Forwarded-For and X-Client-IP headers are only trusted
+     * when the request comes from a known proxy, preventing IP spoofing.
+     */
+    protected function configureTrustedProxies(): void
+    {
+        $proxies = $_ENV['TRUSTED_PROXIES'] ?? '';
+        if (!empty($proxies)) {
+            $proxyList = array_map('trim', explode(',', $proxies));
+            $proxyList = array_filter($proxyList);
+            Request::setTrustedProxies($proxyList);
         }
     }
 

@@ -87,6 +87,25 @@ class Auth
         if ($user && password_verify($password, $user->password)) {
             // Success: clear lockout counter
             RateLimiter::clear($lockKey);
+
+            // Auto-rehash: upgrade password hash if using outdated algorithm/cost
+            // Satisfies: NIST IA-5 — ensure stored credentials use current best practices
+            if (password_needs_rehash($user->password, PASSWORD_DEFAULT)) {
+                try {
+                    $user->password = password_hash($password, PASSWORD_DEFAULT);
+                    $user->save();
+                    Log::info('Password hash auto-upgraded', [
+                        'user_id' => $user->id,
+                    ]);
+                } catch (\Throwable $e) {
+                    // Non-critical: don't block login if rehash save fails
+                    Log::warning('Password rehash save failed', [
+                        'user_id' => $user->id,
+                        'error'   => $e->getMessage(),
+                    ]);
+                }
+            }
+
             // R2: Log successful authentication
             Log::info('Authentication successful', [
                 'user_id' => $user->id,

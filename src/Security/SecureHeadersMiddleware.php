@@ -42,8 +42,14 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         // Restrict access to browser features (Permissions-Policy)
         $response->setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
 
-        // Strict Transport Security (HSTS) if HTTPS
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        // Strict Transport Security (HSTS)
+        // Supports: direct HTTPS detection, FORCE_HSTS env for reverse proxies,
+        // and auto-enable in production environments.
+        $isHttps    = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+        $forceHsts  = ($_ENV['FORCE_HSTS'] ?? 'false') === 'true';
+        $isProduction = ($_ENV['APP_ENV'] ?? 'local') === 'production';
+
+        if ($isHttps || $forceHsts || $isProduction) {
             $response->setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 

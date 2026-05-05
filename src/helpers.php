@@ -57,11 +57,19 @@ if (!function_exists('asset')) {
 
 if (!function_exists('auth')) {
     /**
-     * Return Auth manager instance (static Facade wrapper).
+     * Return Auth class name for static method calls.
+     *
+     * Usage:
+     *   auth()::check()     → Auth::check()
+     *   auth()::user()      → Auth::user()
+     *   auth()::hasRole('admin')
+     *
+     * All Auth methods are static, so this returns the class string
+     * which PHP can use for static dispatch via ::.
      */
-    function auth(): \LunoxHoshizaki\Auth\Auth
+    function auth(): string
     {
-        return new \LunoxHoshizaki\Auth\Auth();
+        return \LunoxHoshizaki\Auth\Auth::class;
     }
 }
 
@@ -190,17 +198,19 @@ if (!function_exists('dump')) {
 if (!function_exists('abort')) {
     /**
      * Throw an HTTP error response.
+     *
+     * Tries to render the errors.error view, falls back to plain text.
      */
     function abort(int $code, string $message = ''): never
     {
         http_response_code($code);
         try {
-            echo \LunoxHoshizaki\View\View::make('basic.errors.error', [
+            echo \LunoxHoshizaki\View\View::make('errors.error', [
                 'code' => $code,
                 'message' => $message
             ]);
-        } catch (\Exception $e) {
-            echo "Error {$code}: {$message}";
+        } catch (\Throwable $e) {
+            echo "Error {$code}: " . htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
         }
         exit;
     }
@@ -213,13 +223,29 @@ if (!function_exists('session')) {
      * Usage:
      *   session('key')              → get value
      *   session('key', 'default')   → get with default
+     *   session(['key' => 'val'])   → set value(s)
      */
-    function session(string $key, mixed $default = null): mixed
+    function session(string|array $key = null, mixed $default = null): mixed
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        return $_SESSION[$key] ?? $default;
+
+        // Set mode: session(['key' => 'value', ...])
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $_SESSION[$k] = $v;
+            }
+            return null;
+        }
+
+        // Get mode: session('key') or session('key', 'default')
+        if (is_string($key)) {
+            return $_SESSION[$key] ?? $default;
+        }
+
+        // No arguments — return null (or could return session manager)
+        return null;
     }
 }
 
@@ -231,5 +257,71 @@ if (!function_exists('url')) {
     {
         $base = $_ENV['APP_URL'] ?? 'http://localhost:8000';
         return rtrim($base, '/') . '/' . ltrim($path, '/');
+    }
+}
+
+if (!function_exists('method_field')) {
+    /**
+     * Generate a hidden input field for HTTP method spoofing.
+     *
+     * HTML forms only support GET and POST. Use this helper to submit
+     * PUT, PATCH, or DELETE requests from forms:
+     *
+     *   <form method="POST" action="/users/5">
+     *       <?= csrf_field() ?>
+     *       <?= method_field('DELETE') ?>
+     *       <button type="submit">Delete</button>
+     *   </form>
+     */
+    function method_field(string $method): string
+    {
+        $method = strtoupper($method);
+        return '<input type="hidden" name="_method" value="' . htmlspecialchars($method) . '">';
+    }
+}
+
+if (!function_exists('response')) {
+    /**
+     * Create a new Response instance or JSON response.
+     *
+     * Usage:
+     *   return response()->json(['status' => 'ok']);
+     *   return response('Hello', 200);
+     */
+    function response(string $content = '', int $statusCode = 200, array $headers = []): \LunoxHoshizaki\Http\Response
+    {
+        return new \LunoxHoshizaki\Http\Response($content, $statusCode, $headers);
+    }
+}
+
+if (!function_exists('app')) {
+    /**
+     * Get the Application instance, or resolve a service from the Container.
+     *
+     * Usage:
+     *   app()                       → Application instance
+     *   app(UserService::class)     → Resolve UserService via Container
+     */
+    function app(?string $abstract = null): mixed
+    {
+        if (is_null($abstract)) {
+            return \LunoxHoshizaki\Application::getInstance();
+        }
+        return \LunoxHoshizaki\Container\Container::getInstance()->make($abstract);
+    }
+}
+
+if (!function_exists('resolve')) {
+    /**
+     * Resolve a service from the IoC Container.
+     *
+     * Alias for app(ServiceClass::class).
+     *
+     * Usage:
+     *   $logger = resolve(Logger::class);
+     */
+    function resolve(string $abstract, array $params = []): mixed
+    {
+        return \LunoxHoshizaki\Container\Container::getInstance()->make($abstract, $params);
     }
 }
